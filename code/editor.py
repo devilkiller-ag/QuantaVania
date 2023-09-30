@@ -40,6 +40,17 @@ class Editor:
 	### SUPPORT FUNCTIONS
 	def import_graphics(self):
 		self.water_bottom = loadImage('graphics/terrain/water/water_bottom.png')
+		
+		# import animations
+		self.animations = {} # Ex: {3: {'frame index': 0, 'frames': [graphics_surfaces_01, graphics_surface_02], 'length': 2}}
+		for key, value in EDITOR_DATA.items():
+			if value['graphics']:
+				graphics = import_images_from_folder(value['graphics'])
+				self.animations[key] = {
+					'frame index': 0,
+					'frames': graphics,
+					'length': len(graphics)
+				}
 
 	def get_current_cell(self):
 		distance_to_origin = vector(mouse_postion()) - self.origin
@@ -84,6 +95,13 @@ class Editor:
 						# terrain neighbors
 						if self.canvas_data[neighbor_cell].has_terrain:
 							self.canvas_data[cell].terrain_neighbors.append(name)
+
+	def animation_update(self, dt):
+		for value in self.animations.values():
+			value['frame index'] += ANIMATION_SPEED * dt
+			# reset frame_index after all frames of one animation are drawn
+			if value['frame index'] >= value['length']:
+				value['frame index'] = 0
 
 	### FUNCTIONS TO HANDLE INPUTS
 	def event_loop(self):
@@ -184,9 +202,10 @@ class Editor:
 				if tile.water_on_top:
 					self.editor_display_surface.blit(self.water_bottom, pos)
 				else:
-					test_surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
-					test_surface.fill('blue')
-					self.editor_display_surface.blit(test_surface, pos)
+					water_frames = self.animations[3]['frames'] # Since Water Tiles has key 3 in the EDITOR_DATA
+					index = int(self.animations[3]['frame index'])
+					water_surface = water_frames[index]
+					self.editor_display_surface.blit(water_surface, pos)
 
 			## coin
 			if tile.coin:
@@ -200,9 +219,12 @@ class Editor:
 				test_surface.fill('red')
 				self.editor_display_surface.blit(test_surface, pos)
 
-	### FUNCTION TO RUN EVERYTHING
+	### FUNCTION TO RUN & UPDATE EVERYTHING
 	def run(self, dt):
 		self.event_loop()
+
+		# updating
+		self.animation_update(dt)
 
 		# drawing
 		self.editor_display_surface.fill('white')
