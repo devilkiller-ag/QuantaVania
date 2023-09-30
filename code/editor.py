@@ -8,11 +8,14 @@ from settings import *
 from menu import Menu
 
 class Editor:
-	def __init__(self):
+	def __init__(self, land_tiles):
 
 		## main setup 
 		self.editor_display_surface = pygame.display.get_surface()
 		self.canvas_data = {}
+
+		## imported graphics
+		self.land_tiles = land_tiles
 
 		## navigation
 		self.origin = vector()
@@ -46,6 +49,30 @@ class Editor:
 			row = int(distance_to_origin.y / TILE_SIZE) - 1
 
 		return col, row
+
+	def check_neighbors(self, cell_position):
+		# create a local cluster of cells around the target cell
+		cluster_size = 3
+		local_cluster = [
+			(cell_position[0] + col - int(cluster_size / 2), cell_position[1] + row - int(cluster_size / 2)) 
+			for col in range(cluster_size) 
+			for row in range(cluster_size)
+		]
+		
+
+		# check neighbors
+		for cell in local_cluster:
+			# if cell exists in the canvas, set neighbors to []
+			if cell in self.canvas_data:
+				self.canvas_data[cell].terrain_neighbors = []
+				
+				# now check neighbors
+				for name, side in NEIGHBOR_DIRECTIONS.items():
+					neighbor_cell = (cell[0] + side[0], cell[1] + side[1])
+
+					if neighbor_cell in self.canvas_data:
+						if self.canvas_data[neighbor_cell].has_terrain:
+							self.canvas_data[cell].terrain_neighbors.append(name)
 
 	### FUNCTIONS TO HANDLE INPUTS
 	def event_loop(self):
@@ -105,6 +132,7 @@ class Editor:
 				else:
 					self.canvas_data[current_cell] = CanvasTile(self.selection_index)
 				
+				self.check_neighbors(current_cell)
 				self.last_selected_cell = current_cell
 
 	### FUNCTIONS TO DRAW THINGS
@@ -134,25 +162,31 @@ class Editor:
 		for cell_pos, tile in self.canvas_data.items():
 			pos = self.origin + vector(cell_pos) * TILE_SIZE
 
+			## terrain
 			if tile.has_terrain:
-				test_surf = pygame.Surface((TILE_SIZE, TILE_SIZE))
-				test_surf.fill('brown')
-				self.editor_display_surface.blit(test_surf, pos)
-
+				terrain_string = ''.join(tile.terrain_neighbors)
+				terrain_style = terrain_string if terrain_string in self.land_tiles else 'X'
+				self.editor_display_surface.blit(self.land_tiles[terrain_style], pos)
+			
+			## water
 			if tile.has_water:
-				test_surf = pygame.Surface((TILE_SIZE, TILE_SIZE))
-				test_surf.fill('blue')
-				self.editor_display_surface.blit(test_surf, pos)
+				test_surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
+				test_surface.fill('blue')
+				self.editor_display_surface.blit(test_surface, pos)
 
+			## coin
 			if tile.coin:
-				test_surf = pygame.Surface((TILE_SIZE, TILE_SIZE))
-				test_surf.fill('yellow')
-				self.editor_display_surface.blit(test_surf, pos)
+				test_surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
+				test_surface.fill('yellow')
+				self.editor_display_surface.blit(test_surface, pos)
 
+			## enemy
 			if tile.enemy:
-				test_surf = pygame.Surface((TILE_SIZE, TILE_SIZE))
-				test_surf.fill('red')
-				self.editor_display_surface.blit(test_surf, pos)
+				test_surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
+				test_surface.fill('red')
+				self.editor_display_surface.blit(test_surface, pos)
+
+
 
 	### FUNCTION TO RUN EVERYTHING
 	def run(self, dt):
