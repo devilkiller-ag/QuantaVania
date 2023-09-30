@@ -209,15 +209,19 @@ class Editor:
 
 			## coin
 			if tile.coin:
-				test_surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
-				test_surface.fill('yellow')
-				self.editor_display_surface.blit(test_surface, pos)
+				coin_frames = self.animations[tile.coin]['frames']
+				index= int(self.animations[tile.coin]['frame index'])
+				coin_surface = coin_frames[index]
+				coin_rect_area = coin_surface.get_rect(center=(pos[0] + TILE_SIZE // 2, pos[1] + TILE_SIZE // 2)) # to center the coins in the grid_box/tile
+				self.editor_display_surface.blit(coin_surface, coin_rect_area)
 
 			## enemy
 			if tile.enemy:
-				test_surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
-				test_surface.fill('red')
-				self.editor_display_surface.blit(test_surface, pos)
+				enemy_frames = self.animations[tile.enemy]['frames']
+				index= int(self.animations[tile.enemy]['frame index'])
+				enemy_surface = enemy_frames[index]
+				enemy_rect_area = enemy_surface.get_rect(midbottom=(pos[0] + TILE_SIZE // 2, pos[1] + TILE_SIZE)) # to make the enemies touch the bottom of the grid_box/tile
+				self.editor_display_surface.blit(enemy_surface, enemy_rect_area)
 
 	### FUNCTION TO RUN & UPDATE EVERYTHING
 	def run(self, dt):
@@ -249,7 +253,7 @@ class CanvasTile:
 		self.coin = None # can be equal to 4, 5, or 6
 
 		## enemy
-		self.enemy = None
+		self.enemy = None # can be equal to 7, 8, 9, or 10
 
 		## objects
 		self.objects = []
