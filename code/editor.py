@@ -3,8 +3,10 @@ import pygame, sys
 from pygame.math import Vector2 as vector
 from pygame.mouse import get_pressed as mouse_buttons # mouse_buttons() will return  bool (if_left_mouse_button_is_pressed, if_middle_mouse_button_is_pressed, if_right_mouse_button_is_pressed)
 from pygame.mouse import get_pos as mouse_postion
+from pygame.image import load as loadImage
 
 from settings import *
+from support import *
 from menu import Menu
 
 class Editor:
@@ -16,6 +18,7 @@ class Editor:
 
 		## imported graphics
 		self.land_tiles = land_tiles
+		self.import_graphics()
 
 		## navigation
 		self.origin = vector()
@@ -35,6 +38,9 @@ class Editor:
 		self.menu = Menu()
 
 	### SUPPORT FUNCTIONS
+	def import_graphics(self):
+		self.water_bottom = loadImage('graphics/terrain/water/water_bottom.png')
+
 	def get_current_cell(self):
 		distance_to_origin = vector(mouse_postion()) - self.origin
 
@@ -51,26 +57,31 @@ class Editor:
 		return col, row
 
 	def check_neighbors(self, cell_position):
-		# create a local cluster of cells around the target cell
+		# create a local cluster of cells around the target cell (so that we only need to check only those 9 tiles in the cluster and not all the tiles)
 		cluster_size = 3
 		local_cluster = [
 			(cell_position[0] + col - int(cluster_size / 2), cell_position[1] + row - int(cluster_size / 2)) 
 			for col in range(cluster_size) 
 			for row in range(cluster_size)
 		]
-		
-
 		# check neighbors
 		for cell in local_cluster:
-			# if cell exists in the canvas, set neighbors to []
+			# if cell exists in the canvas, set neighbors to [], and water_on_top False (Reset)
 			if cell in self.canvas_data:
 				self.canvas_data[cell].terrain_neighbors = []
-				
+				self.canvas_data[cell].water_on_top = False
+
 				# now check neighbors
 				for name, side in NEIGHBOR_DIRECTIONS.items():
 					neighbor_cell = (cell[0] + side[0], cell[1] + side[1])
-
+					
 					if neighbor_cell in self.canvas_data:
+						# water top neighbor
+						if self.canvas_data[cell].has_water: # if water in the current tile
+							if name == 'A' and self.canvas_data[neighbor_cell].has_water:# and if water tile on top 
+								self.canvas_data[cell].water_on_top = True
+
+						# terrain neighbors
 						if self.canvas_data[neighbor_cell].has_terrain:
 							self.canvas_data[cell].terrain_neighbors.append(name)
 
@@ -170,9 +181,12 @@ class Editor:
 			
 			## water
 			if tile.has_water:
-				test_surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
-				test_surface.fill('blue')
-				self.editor_display_surface.blit(test_surface, pos)
+				if tile.water_on_top:
+					self.editor_display_surface.blit(self.water_bottom, pos)
+				else:
+					test_surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
+					test_surface.fill('blue')
+					self.editor_display_surface.blit(test_surface, pos)
 
 			## coin
 			if tile.coin:
@@ -185,8 +199,6 @@ class Editor:
 				test_surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
 				test_surface.fill('red')
 				self.editor_display_surface.blit(test_surface, pos)
-
-
 
 	### FUNCTION TO RUN EVERYTHING
 	def run(self, dt):
