@@ -77,6 +77,9 @@ class Editor:
 					'length': len(graphics)
 				}
 
+		# import preview surfaces
+		self.preview_surfaces = {key: loadImage(value['preview']) for key, value in EDITOR_DATA.items() if value['preview']}
+
 	def get_current_cell(self):
 		distance_to_origin = vector(mouse_postion()) - self.origin
 
@@ -309,6 +312,82 @@ class Editor:
 		# Draw Objects (Player, Trees)
 		self.canvas_objects.draw(self.editor_display_surface)
 
+	def preview(self):
+		selected_object = self.mouse_on_which_object()
+		if not self.menu.menu_area.collidepoint(mouse_postion()): # if we are not in the menu
+			## draws marker around the object when hovered over 
+			if selected_object:
+				marker_rect = selected_object.rect.inflate(10, 10)
+				marker_line_color = 'black'
+				market_line_width = 3
+				marker_line_size = 15
+				# topleft marker
+				pygame.draw.lines(
+					self.editor_display_surface, 
+					marker_line_color, 
+					False, 
+					((
+						marker_rect.topleft[0], marker_rect.topleft[1] + marker_line_size), 
+						marker_rect.topleft,  
+						(marker_rect.topleft[0] + marker_line_size, marker_rect.topleft[1])
+					), 
+					market_line_width
+				)
+				# bottomleft marker
+				pygame.draw.lines(
+					self.editor_display_surface, 
+					marker_line_color, 
+					False, 
+					((
+						marker_rect.bottomleft[0], marker_rect.bottomleft[1] - marker_line_size), 
+						marker_rect.bottomleft,  
+						(marker_rect.bottomleft[0] + marker_line_size, marker_rect.bottomleft[1])
+					), 
+					market_line_width
+				)
+				# topright marker
+				pygame.draw.lines(
+					self.editor_display_surface, 
+					marker_line_color, 
+					False, 
+					((
+						marker_rect.topright[0], marker_rect.topright[1] + marker_line_size), 
+						marker_rect.topright,  
+						(marker_rect.topright[0] - marker_line_size, marker_rect.topright[1])
+					), 
+					market_line_width
+				)
+				# bottomright marker
+				pygame.draw.lines(
+					self.editor_display_surface, 
+					marker_line_color, 
+					False, 
+					((
+						marker_rect.bottomright[0], marker_rect.bottomright[1] - marker_line_size), 
+						marker_rect.bottomright,  
+						(marker_rect.bottomright[0] - marker_line_size, marker_rect.bottomright[1])
+					), 
+					market_line_width
+				)
+
+			## preview the tile / object if we are placing any object on the canvas
+			else:
+				data_type_dict = {key: value for key, value in EDITOR_DATA.items()}
+				preview_surface = self.preview_surfaces[self.selection_index].copy()
+				preview_surface.set_alpha(200)
+
+				# preview tile
+				if data_type_dict[self.selection_index] == 'tile':
+					current_cell = self.get_current_cell()
+					preview_rect = preview_surface.get_rect(topleft = self.origin + vector(current_cell) * TILE_SIZE)
+
+				# preview object
+				else:
+					preview_rect = preview_surface.get_rect(center = mouse_postion())
+
+				self.editor_display_surface.blit(preview_surface, preview_rect)
+
+
 	### FUNCTION TO RUN & UPDATE EVERYTHING
 	def run(self, dt):
 		self.event_loop()
@@ -324,6 +403,7 @@ class Editor:
 		self.draw_level()
 		self.draw_grid_lines()
 		pygame.draw.circle(self.editor_display_surface, 'red', self.origin, 10)
+		self.preview()
 		self.menu.display(self.selection_index)
 
 
