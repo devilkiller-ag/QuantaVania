@@ -38,7 +38,7 @@ class CustomLevel:
                 
                 match data:
                     case 0: # player
-                        self.player = Player(pos, self.all_sprites, self.collision_sprites)
+                        self.player = Player(pos, asset_dictionary['player'], self.all_sprites, self.collision_sprites)
                     case 1: # sky
                         pass
 
@@ -117,4 +117,3 @@ class CustomLevel:
         ## draw
         self.level_display_surface.fill(SKY_COLOR)
         self.all_sprites.draw(self.level_display_surface)
-        pygame.draw.rect(self.level_display_surface, 'yellow', self.player.hitbox)

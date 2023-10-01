@@ -46,6 +46,10 @@ class Main:
 		self.crab_monster = {folder: import_images_from_folder(f'graphics/enemies/crab_monster/{folder}') for folder in list(walk('graphics/enemies/crab_monster'))[0][1]}
 		self.shell = {folder: import_images_from_folder(f'graphics/enemies/shell_left/{folder}') for folder in list(walk('graphics/enemies/shell_left'))[0][1]} # only importing shell_left as we can easily get all the graphics of shell_right by flipping the graphics of shell_left
 
+		# player
+		self.player_graphics = {folder: import_images_from_folder(f'graphics/player/{folder}') for folder in list(walk('graphics/player'))[0][1]}
+
+
 	def toggle(self): # Toggle (Turn On/Off) between Editor, Levels, CustomLevel, & Menu
 		self.editor_active= not self.editor_active
 	
@@ -61,7 +65,8 @@ class Main:
 			'palms': self.palms,
 			'spikes': self.spikes,
 			'crab_monster': self.crab_monster,
-			'shell': self.shell
+			'shell': self.shell,
+			'player': self.player_graphics
 		}
 
 		self.transition.active = True
