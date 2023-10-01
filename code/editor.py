@@ -4,6 +4,7 @@ from pygame.math import Vector2 as vector
 from pygame.mouse import get_pressed as mouse_buttons # mouse_buttons() will return  bool (if_left_mouse_button_is_pressed, if_middle_mouse_button_is_pressed, if_right_mouse_button_is_pressed)
 from pygame.mouse import get_pos as mouse_postion
 from pygame.image import load as loadImage
+from random import choice, randint
 
 from settings import *
 from support import *
@@ -20,6 +21,13 @@ class Editor:
 		## imported graphics
 		self.land_tiles = land_tiles
 		self.import_graphics()
+
+		## clouds
+		self.current_clouds = []
+		self.cloud_surfaces = import_images_from_folder('graphics/clouds')
+		self.cloud_timer = pygame.USEREVENT + 1
+		pygame.time.set_timer(self.cloud_timer, 2000)
+		self.startup_clouds()
 
 		## navigation
 		self.origin = vector()
@@ -152,6 +160,8 @@ class Editor:
 
 			self.canvas_add()
 			self.canvas_remove()
+
+			self.create_clouds(event)
 
 	def pan_input(self, event):
 		# Check if user wants to pan by using middle mouse button (pressed / released)
@@ -387,22 +397,82 @@ class Editor:
 
 				self.editor_display_surface.blit(preview_surface, preview_rect)
 
+	def display_sky(self, dt):
+		horizon_y = self.sky_handle.rect.centery
+		self.editor_display_surface.fill(SKY_COLOR)
+
+		if horizon_y > 0:
+			## Horizon Lines
+			horizon_rect_1 = pygame.Rect(0, horizon_y - 10, WINDOW_WIDTH, 10)
+			horizon_rect_2 = pygame.Rect(0, horizon_y - 16, WINDOW_WIDTH, 4)
+			horizon_rect_3 = pygame.Rect(0, horizon_y - 20, WINDOW_WIDTH, 2)
+			pygame.draw.rect(self.editor_display_surface, HORIZON_TOP_COLOR, horizon_rect_1)
+			pygame.draw.rect(self.editor_display_surface, HORIZON_TOP_COLOR, horizon_rect_2)
+			pygame.draw.rect(self.editor_display_surface, HORIZON_TOP_COLOR, horizon_rect_3)
+			pygame.draw.line(self.editor_display_surface, HORIZON_COLOR, (0, horizon_y), (WINDOW_WIDTH, horizon_y), 3)
+		
+			## Clouds
+			self.display_clouds(dt, horizon_y)
+
+		## Sea
+		if 0 < horizon_y < WINDOW_HEIGHT: # if horizon is on the screen:
+			sea_rect = pygame.Rect(0, horizon_y, WINDOW_WIDTH, WINDOW_WIDTH)
+			pygame.draw.rect(self.editor_display_surface, SEA_COLOR, sea_rect)
+		if horizon_y < 0: # else fill the entire screen with water
+			self.editor_display_surface.fill(SEA_COLOR)
+
+	def create_clouds(self, event):
+		if event.type == self.cloud_timer:
+			## Create New Clouds on the right side of window
+			cloud_surface = choice(self.cloud_surfaces) # randomly select a cloud from all types of cloud surfaces available
+			cloud_surface = pygame.transform.scale2x(cloud_surface) if randint(0, 4) < 2 else cloud_surface # scale this cloud surfaces by 2x randomly
+			cloud_position = [WINDOW_WIDTH + randint(50, 100), randint(0, WINDOW_HEIGHT)]
+			cloud_speed = randint(20, 50)
+			self.current_clouds.append({
+				'surface': cloud_surface,
+				'position': cloud_position,
+				'speed': cloud_speed
+			})
+
+			## Delete clouds which passes the left side of window
+			self.current_clouds = [cloud for cloud in self.current_clouds if cloud['position'][0] > -400]
+	
+	def startup_clouds(self): # To have some clouds initially as we start the editor
+		for counter in range(20):
+			cloud_surface = choice(self.cloud_surfaces) # randomly select a cloud from all types of cloud surfaces available
+			cloud_surface = pygame.transform.scale2x(cloud_surface) if randint(0, 4) < 2 else cloud_surface # scale this cloud surfaces by 2x randomly
+			cloud_position = [randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT)]
+			cloud_speed = randint(20, 50)
+			self.current_clouds.append({
+				'surface': cloud_surface,
+				'position': cloud_position,
+				'speed': cloud_speed
+			})
+
+	def display_clouds(self, dt, horizon_y):
+		for cloud in self.current_clouds: # cloud.keys: {surface, position, speed}
+			# Move the cloud towards left
+			cloud['position'][0] -= cloud['speed'] * dt
+			x = cloud['position'][0]
+			y = horizon_y - cloud['position'][1] #to draw clouds relative to horizon
+			self.editor_display_surface.blit(cloud['surface'], (x, y))
+
 
 	### FUNCTION TO RUN & UPDATE EVERYTHING
 	def run(self, dt):
 		self.event_loop()
 
-		# updating
+		## updating
 		self.animation_update(dt)
 		self.canvas_objects.update(dt)
 		self.object_timer.update()
 
-
-		# drawing
+		## drawing
 		self.editor_display_surface.fill('white')
+		self.display_sky(dt)
 		self.draw_level()
 		self.draw_grid_lines()
-		pygame.draw.circle(self.editor_display_surface, 'red', self.origin, 10)
+		# pygame.draw.circle(self.editor_display_surface, 'red', self.origin, 10)
 		self.preview()
 		self.menu.display(self.selection_index)
 
