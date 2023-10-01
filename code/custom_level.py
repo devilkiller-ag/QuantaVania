@@ -4,7 +4,7 @@ from pygame.math import Vector2 as vector
 
 from settings import *
 from support import *
-from sprites import Generic, AnimatedSprite, ParticleEffect, Coin, Spikes, CrabMonster, Shell, Player
+from sprites import Generic, CollidableBlock, AnimatedSprite, ParticleEffect, Coin, Spikes, CrabMonster, Shell, Player
 
 class CustomLevel:
     def __init__(self, level_grid, switch, asset_dictionary):
@@ -15,6 +15,7 @@ class CustomLevel:
         self.all_sprites = pygame.sprite.Group()
         self.coin_sprites = pygame.sprite.Group()
         self.damage_sprites = pygame.sprite.Group() ## Sprites of Enemies which will cause damage to player
+        self.collision_sprites = pygame.sprite.Group()
         
         self.build_level(level_grid, asset_dictionary)
 
@@ -25,7 +26,7 @@ class CustomLevel:
         for layer_name, layer in level_grid.items():
             for pos, data in layer.items():
                 if layer_name == 'terrain':
-                    Generic(pos, asset_dictionary['land'][data],self.all_sprites)
+                    Generic(pos, asset_dictionary['land'][data], [self.all_sprites, self.collision_sprites])
                 
                 if layer_name == 'water':
                     if data == 'top':  
@@ -37,7 +38,7 @@ class CustomLevel:
                 
                 match data:
                     case 0: # player
-                        self.player = Player(pos, self.all_sprites)
+                        self.player = Player(pos, self.all_sprites, self.collision_sprites)
                     case 1: # sky
                         pass
 
@@ -56,19 +57,25 @@ class CustomLevel:
                         print(asset_dictionary['crab_monster']['idle'])
                         CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.damage_sprites])
                     case 9: # Shell pointing left
-                        Shell('left', asset_dictionary['shell'], pos, self.all_sprites)
+                        Shell('left', asset_dictionary['shell'], pos, [self.all_sprites, self.collision_sprites])
                     case 10: # Shell pointing right
-                        Shell('right', asset_dictionary['shell'], pos, self.all_sprites)
+                        Shell('right', asset_dictionary['shell'], pos, [self.all_sprites, self.collision_sprites])
 
-                    ## Trees
+                    ## Foreground Palm Trees
                     case 11: # small palm fg
                         AnimatedSprite(asset_dictionary['palms']['small_fg'], pos, self.all_sprites)
+                        CollidableBlock(pos, (76, 50), [self.collision_sprites]) # Invisible because CollidableBlock is not added to to self.all_sprites and CollidableBlock iself do not have any draw method which can be called through self.collision_sprites
                     case 12: # large palm fg
                         AnimatedSprite(asset_dictionary['palms']['large_fg'], pos, self.all_sprites)
+                        CollidableBlock(pos, (76, 50), [self.collision_sprites]) ## Hit & Trail Values
                     case 13: # left palm fg
                         AnimatedSprite(asset_dictionary['palms']['left_fg'], pos, self.all_sprites)
+                        CollidableBlock(pos, (76, 50), [self.collision_sprites])
                     case 14: # right palm fg
                         AnimatedSprite(asset_dictionary['palms']['right_fg'], pos, self.all_sprites)
+                        CollidableBlock(pos + vector(50, 0), (76, 50), [self.collision_sprites])
+
+                    ## Background Palm Trees
                     case 15: # small palm bg
                         AnimatedSprite(asset_dictionary['palms']['small_bg'], pos, self.all_sprites)
                     case 16: # large palm bg
@@ -110,3 +117,4 @@ class CustomLevel:
         ## draw
         self.level_display_surface.fill(SKY_COLOR)
         self.all_sprites.draw(self.level_display_surface)
+        pygame.draw.rect(self.level_display_surface, 'yellow', self.player.hitbox)
