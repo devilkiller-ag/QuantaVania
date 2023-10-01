@@ -2,6 +2,7 @@
 import pygame
 from pygame.image import load as loadImage
 from pygame.math import Vector2 as vector
+from os import walk
 
 from settings import *
 from support import *
@@ -37,6 +38,14 @@ class Main:
 		self.diamond = import_images_from_folder('graphics/items/diamond')
 		self.particles = import_images_from_folder('graphics/items/particle')
 
+		# palm trees
+		self.palms = {folder: import_images_from_folder(f'graphics/terrain/palm/{folder}') for folder in list(walk('graphics/terrain/palm'))[0][1]}
+
+		# enemies
+		self.spikes = loadImage('graphics/enemies/spikes/spikes.png').convert_alpha()
+		self.crab_monster = {folder: import_images_from_folder(f'graphics/enemies/crab_monster/{folder}') for folder in list(walk('graphics/enemies/crab_monster'))[0][1]}
+		self.shell = {folder: import_images_from_folder(f'graphics/enemies/shell_left/{folder}') for folder in list(walk('graphics/enemies/shell_left'))[0][1]} # only importing shell_left as we can easily get all the graphics of shell_right by flipping the graphics of shell_left
+
 	def toggle(self): # Toggle (Turn On/Off) between Editor, Levels, CustomLevel, & Menu
 		self.editor_active= not self.editor_active
 	
@@ -48,7 +57,11 @@ class Main:
 			'gold': self.gold,
 			'silver': self.silver,
 			'diamond': self.diamond,
-			'particles': self.particles
+			'particles': self.particles,
+			'palms': self.palms,
+			'spikes': self.spikes,
+			'crab_monster': self.crab_monster,
+			'shell': self.shell
 		}
 
 		self.transition.active = True
