@@ -32,9 +32,13 @@ class Main:
 		self.editor_active= not self.editor_active
 	
 	def switch(self, custom_level_grid = None): # Switch between Editor, Levels, CustomLevel, & Menu
+		asset_dictionary = {
+			'land': self.land_tiles
+		}
+
 		self.transition.active = True
 		if custom_level_grid:
-			self.custom_level = CustomLevel(custom_level_grid, self.switch)
+			self.custom_level = CustomLevel(custom_level_grid, self.switch, asset_dictionary)
 
 	def run(self):
 		while True:

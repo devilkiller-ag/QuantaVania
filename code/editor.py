@@ -176,7 +176,7 @@ class Editor:
 		layers = {
 			'water': {},
 			'bg palms': {},
-			'terrain': {},
+			'terrain': {}, # Ex item (pos of key: Filename): (128, 64): 'ABC'
 			'enemies': {},
 			'coins': {},
 			'fg objects': {}

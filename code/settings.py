@@ -19,7 +19,7 @@ EDITOR_DATA = {
 	6: {'style': 'coin', 'type': 'tile', 'menu_type': 'coin', 'menu_surf': 'graphics/menu/diamond.png', 'preview': 'graphics/preview/diamond.png', 'graphics': 'graphics/items/diamond'},
 
 	7:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/spikes.png',      'preview': 'graphics/preview/spikes.png',      'graphics': 'graphics/enemies/spikes'},
-	8:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/tooth_monster.png',       'preview': 'graphics/preview/tooth_monster.png',       'graphics': 'graphics/enemies/tooth_monster/idle'},
+	8:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/crab_monster.png',       'preview': 'graphics/preview/crab_monster.png',       'graphics': 'graphics/enemies/crab_monster/idle'},
 	9:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shell_left.png',  'preview': 'graphics/preview/shell_left.png',  'graphics': 'graphics/enemies/shell_left/idle'},
 	10: {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shell_right.png', 'preview': 'graphics/preview/shell_right.png', 'graphics': 'graphics/enemies/shell_right/idle'},
 	
