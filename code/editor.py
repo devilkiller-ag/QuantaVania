@@ -49,6 +49,8 @@ class Editor:
 
 		## Objects/Sprites: Player, Trees
 		self.canvas_objects = pygame.sprite.Group()
+		self.foreground_objects = pygame.sprite.Group() # to store foreground palm trees
+		self.background_objects = pygame.sprite.Group() # to store background palm trees
 		self.object_drag_active = False
 		self.object_timer = Timer(OBJECT_PLACING_DELAY_TIME) # To restrict player to draw another object (tree) just after placing first one. This will avoid the placing of thousands of objects (trees) on just draging the mouse after placing the first object (tree).
 
@@ -58,7 +60,7 @@ class Editor:
 			frames = self.animations[0]['frames'], 
 			tile_id = 0, 
 			origin = self.origin, 
-			group = self.canvas_objects
+			group = [self.canvas_objects, self.foreground_objects]
 		)
 
 		# Sky
@@ -67,7 +69,7 @@ class Editor:
 			frames = [self.sky_handle], 
 			tile_id = 1, 
 			origin = self.origin, 
-			group = self.canvas_objects
+			group = [self.canvas_objects, self.background_objects]
 		)
 
 	### SUPPORT FUNCTIONS
@@ -216,7 +218,7 @@ class Editor:
 
 			# Switch to Play Mode When user press ENTER (EXPORT MAP AND CREATE ACTUAL LEVEL)
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-				print(self.create_grid())
+				self.create_grid()
 			
 			self.pan_input(event) # pass the event to pan_input to detect if user wants to pan the editor area and act accordingly
 			self.selection_hotkeys(event)
@@ -282,12 +284,13 @@ class Editor:
 			
 			else: ## ADD CANVAS OBJECT
 				if not self.object_timer.active:
+					groups = [self.canvas_objects, self.background_objects] if EDITOR_DATA[self.selection_index]['style'] == 'palm_bg' else [self.canvas_objects, self.foreground_objects] 
 					CanvasObject(
 						pos = mouse_postion(), 
 						frames = self.animations[self.selection_index]['frames'], 
 						tile_id = self.selection_index, 
 						origin = self.origin, 
-						group = self.canvas_objects
+						group = groups
 					)
 					self.object_timer.activate()
 
@@ -349,6 +352,9 @@ class Editor:
 		self.editor_display_surface.blit(self.grid_lines_surface, (0, 0))
 
 	def draw_level(self):
+		# Draw background objects (Background Palms, Sky Handle)
+		self.background_objects.draw(self.editor_display_surface)
+		
 		# Draw Tiles (Terrain, Water, Coin, Enemy)
 		for cell_pos, tile in self.canvas_data.items():
 			pos = self.origin + vector(cell_pos) * TILE_SIZE
@@ -385,8 +391,8 @@ class Editor:
 				enemy_rect_area = enemy_surface.get_rect(midbottom=(pos[0] + TILE_SIZE // 2, pos[1] + TILE_SIZE)) # to make the enemies touch the bottom of the grid_box/tile
 				self.editor_display_surface.blit(enemy_surface, enemy_rect_area)
 
-		# Draw Objects (Player, Trees)
-		self.canvas_objects.draw(self.editor_display_surface)
+		# Draw foreground objects (Foreground Palms, Player)
+		self.foreground_objects.draw(self.editor_display_surface)
 
 	def preview(self):
 		selected_object = self.mouse_on_which_object()
