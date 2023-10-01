@@ -11,6 +11,7 @@ from support import *
 from menu import Menu
 from timer import Timer
 
+
 class Editor:
 	def __init__(self, land_tiles):
 
@@ -88,8 +89,8 @@ class Editor:
 		# import preview surfaces
 		self.preview_surfaces = {key: loadImage(value['preview']) for key, value in EDITOR_DATA.items() if value['preview']}
 
-	def get_current_cell(self):
-		distance_to_origin = vector(mouse_postion()) - self.origin
+	def get_current_cell(self, object = None):
+		distance_to_origin = vector(mouse_postion()) - self.origin if not object else vector(object.distance_to_origin) - self.origin
 
 		if distance_to_origin.x > 0:
 			col = int(distance_to_origin.x / TILE_SIZE)
@@ -108,7 +109,7 @@ class Editor:
 			if sprite.rect.collidepoint(mouse_postion()):
 				return sprite
 
-	def check_neighbors(self, cell_position):
+	def check_neighbours(self, cell_position):
 		# create a local cluster of cells around the target cell (so that we only need to check only those 9 tiles in the cluster and not all the tiles)
 		cluster_size = 3
 		local_cluster = [
@@ -116,14 +117,14 @@ class Editor:
 			for col in range(cluster_size) 
 			for row in range(cluster_size)
 		]
-		# check neighbors
+		# check neighbours
 		for cell in local_cluster:
-			# if cell exists in the canvas, set neighbors to [], and water_on_top False (Reset)
+			# if cell exists in the canvas, set neighbours to [], and water_on_top False (Reset)
 			if cell in self.canvas_data:
-				self.canvas_data[cell].terrain_neighbors = []
+				self.canvas_data[cell].terrain_neighbours = []
 				self.canvas_data[cell].water_on_top = False
 
-				# now check neighbors
+				# now check neighbours
 				for name, side in NEIGHBOR_DIRECTIONS.items():
 					neighbor_cell = (cell[0] + side[0], cell[1] + side[1])
 					
@@ -133,9 +134,9 @@ class Editor:
 							if name == 'A' and self.canvas_data[neighbor_cell].has_water:# and if water tile on top 
 								self.canvas_data[cell].water_on_top = True
 
-						# terrain neighbors
+						# terrain neighbours
 						if self.canvas_data[neighbor_cell].has_terrain:
-							self.canvas_data[cell].terrain_neighbors.append(name)
+							self.canvas_data[cell].terrain_neighbours.append(name)
 
 	def animation_update(self, dt):
 		for value in self.animations.values():
@@ -144,6 +145,67 @@ class Editor:
 			if value['frame index'] >= value['length']:
 				value['frame index'] = 0
 
+	### FUNCTIONS TO EXPORT DESIGNED MAP TO THE LEVEL FOR USER TO PLAY
+	def create_grid(self):
+		'''
+		Exports the level
+		'''
+		## empty the tile objects stored previously
+		for tile in self.canvas_data.values():
+			tile.objects = []
+		
+		## add objects to the tiles
+		for object in self.canvas_objects:
+			current_cell = self.get_current_cell(object)
+			offset = vector(object.distance_to_origin) - (vector(current_cell) * TILE_SIZE) # how far is the topleft of the object from the origin(topleft) of the cell
+
+			if current_cell in self.canvas_data: # tile exists already
+				self.canvas_data[current_cell].add_id(object.tile_id, offset)
+			else: # no tile exists yet
+				self.canvas_data[current_cell] = CanvasTile(object.tile_id,  offset)
+		
+		## create grid
+		# grid offset: For exporting tiles which really have objects/data and not other empty cells
+		# top-left tile which is actually filled
+		top  = (sorted(self.canvas_data.keys(), key = lambda tile: tile[1])[0])[1]
+		left = (sorted(self.canvas_data.keys(), key = lambda tile: tile[0])[0])[0]
+		# create empty grid
+		layers = {
+			'water': {},
+			'bg palms': {},
+			'terrain': {},
+			'enemies': {},
+			'coins': {},
+			'fg objects': {}
+		}
+		# fill the grid
+		for tile_pos, tile in self.canvas_data.items():
+			row_adjusted = tile_pos[1] - top
+			col_adjusted = tile_pos[0] - left
+			x = col_adjusted * TILE_SIZE
+			y = row_adjusted * TILE_SIZE
+
+			if tile.has_water:
+				layers['water'][(x, y)] = tile.get_water()
+			
+			if tile.has_terrain:
+				layers['terrain'][(x, y)] = tile.get_terrain() if tile.get_terrain() in self.land_tiles else 'X'
+			
+			if tile.coin:
+				layers['coins'][(x + TILE_SIZE // 2, y + TILE_SIZE // 2)] = tile.coin #  '+ TILE_SIZE // 2' to make coin at the center of the tile
+			
+			if tile.enemy:
+				layers['enemies'][(x, y)] = tile.enemy
+			
+			if tile.objects: # (object, offset  from the topleft)
+				for obj, offset in tile.objects:
+					if obj in [key for key, value in EDITOR_DATA.items() if value['style'] == 'palm_bg']: # bg palm; key = [15, 16, 17, 18]
+						layers['bg palms'][(int(x + offset.x), int(y + offset.y))] = obj
+					else: #fg objects
+						layers['fg objects'][(int(x + offset.x), int(y + offset.y))] = obj
+		
+		return layers
+	
 	### FUNCTIONS TO HANDLE INPUTS
 	def event_loop(self):
 		for event in pygame.event.get():
@@ -151,6 +213,10 @@ class Editor:
 			if event.type == pygame.QUIT:
 				pygame.quit()
 				sys.exit()
+
+			# Switch to Play Mode When user press ENTER (EXPORT MAP AND CREATE ACTUAL LEVEL)
+			if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+				print(self.create_grid())
 			
 			self.pan_input(event) # pass the event to pan_input to detect if user wants to pan the editor area and act accordingly
 			self.selection_hotkeys(event)
@@ -211,7 +277,7 @@ class Editor:
 					else:
 						self.canvas_data[current_cell] = CanvasTile(self.selection_index)
 					
-					self.check_neighbors(current_cell)
+					self.check_neighbours(current_cell)
 					self.last_selected_cell = current_cell
 			
 			else: ## ADD CANVAS OBJECT
@@ -244,7 +310,7 @@ class Editor:
 					if self.canvas_data[current_cell].is_empty:
 						del self.canvas_data[current_cell]
 					
-					self.check_neighbors(current_cell)
+					self.check_neighbours(current_cell)
 
 	def object_drag(self, event):
 		if event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[0]:
@@ -289,7 +355,7 @@ class Editor:
 
 			## terrain
 			if tile.has_terrain:
-				terrain_string = ''.join(tile.terrain_neighbors)
+				terrain_string = ''.join(tile.terrain_neighbours)
 				terrain_style = terrain_string if terrain_string in self.land_tiles else 'X'
 				self.editor_display_surface.blit(self.land_tiles[terrain_style], pos)
 			
@@ -457,7 +523,6 @@ class Editor:
 			y = horizon_y - cloud['position'][1] #to draw clouds relative to horizon
 			self.editor_display_surface.blit(cloud['surface'], (x, y))
 
-
 	### FUNCTION TO RUN & UPDATE EVERYTHING
 	def run(self, dt):
 		self.event_loop()
@@ -478,7 +543,7 @@ class Editor:
 
 
 class CanvasTile:
-	def __init__(self, tile_id):
+	def __init__(self, tile_id, object_offset_from_tile_origin = vector()):
 		self.is_empty = False
 
 		## terrain
@@ -495,15 +560,21 @@ class CanvasTile:
 		## enemy
 		self.enemy = None # can be equal to 7, 8, 9, or 10
 
-		self.add_id(tile_id)
+		## objects
+		self.objects = []
 
-	def add_id(self, tile_id):
+		self.add_id(tile_id, offset = object_offset_from_tile_origin)
+
+	def add_id(self, tile_id, offset = vector()):
 		options = {key: value['style'] for key, value in EDITOR_DATA.items()}
 		match options[tile_id]:
 			case 'terrain': self.has_terrain = True
 			case 'water': self.has_water = True
 			case 'coin': self.coin = tile_id
 			case 'enemy': self.enemy = tile_id
+			case _: # handling objects
+				if (tile_id, offset) not in self.objects:
+					self.objects.append((tile_id, offset))
 
 	def remove_id(self, tile_id):
 		options = {key: value['style'] for key, value in EDITOR_DATA.items()}
@@ -517,6 +588,12 @@ class CanvasTile:
 	def check_content(self):
 		if not self.has_terrain and not self.has_water and not self.coin and not self.enemy:
 			self.is_empty = True
+	
+	def get_water(self):
+		return 'bottom' if self.water_on_top else 'top'
+	
+	def get_terrain(self):
+		return ''.join(self.terrain_neighbours)
 
 
 class CanvasObject(pygame.sprite.Sprite):
