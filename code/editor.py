@@ -174,7 +174,7 @@ class Editor:
 		left = (sorted(self.canvas_data.keys(), key = lambda tile: tile[0])[0])[0]
 		# create empty grid
 		layers = {
-			'water': {},
+			'water': {}, # Ex item (pos of key: type): (128, 64): 'water top' / 'water bottom'
 			'bg palms': {},
 			'terrain': {}, # Ex item (pos of key: Filename): (128, 64): 'ABC'
 			'enemies': {},

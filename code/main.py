@@ -26,14 +26,29 @@ class Main:
 		pygame.mouse.set_cursor(cursor)
 
 	def import_graphics(self):
+		# terrains
 		self.land_tiles = import_images_from_folder_as_dict('graphics/terrain/land')
+		self.water_bottom = loadImage('graphics/terrain/water/water_bottom.png').convert_alpha()
+		self.water_top_animation = import_images_from_folder('graphics/terrain/water/animation')
+
+		# coins
+		self.gold = import_images_from_folder('graphics/items/gold')
+		self.silver = import_images_from_folder('graphics/items/silver')
+		self.diamond = import_images_from_folder('graphics/items/diamond')
+		self.particles = import_images_from_folder('graphics/items/particle')
 
 	def toggle(self): # Toggle (Turn On/Off) between Editor, Levels, CustomLevel, & Menu
 		self.editor_active= not self.editor_active
 	
 	def switch(self, custom_level_grid = None): # Switch between Editor, Levels, CustomLevel, & Menu
 		asset_dictionary = {
-			'land': self.land_tiles
+			'land': self.land_tiles,
+			'water bottom': self.water_bottom,
+			'water top': self.water_top_animation,
+			'gold': self.gold,
+			'silver': self.silver,
+			'diamond': self.diamond,
+			'particles': self.particles
 		}
 
 		self.transition.active = True
