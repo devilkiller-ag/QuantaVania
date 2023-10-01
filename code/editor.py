@@ -13,11 +13,12 @@ from timer import Timer
 
 
 class Editor:
-	def __init__(self, land_tiles):
+	def __init__(self, land_tiles, switch):
 
 		## main setup 
 		self.editor_display_surface = pygame.display.get_surface()
 		self.canvas_data = {}
+		self.switch = switch
 
 		## imported graphics
 		self.land_tiles = land_tiles
@@ -218,7 +219,7 @@ class Editor:
 
 			# Switch to Play Mode When user press ENTER (EXPORT MAP AND CREATE ACTUAL LEVEL)
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-				self.create_grid()
+				self.switch(self.create_grid())
 			
 			self.pan_input(event) # pass the event to pan_input to detect if user wants to pan the editor area and act accordingly
 			self.selection_hotkeys(event)
@@ -547,7 +548,6 @@ class Editor:
 		self.preview()
 		self.menu.display(self.selection_index)
 
-
 class CanvasTile:
 	def __init__(self, tile_id, object_offset_from_tile_origin = vector()):
 		self.is_empty = False
@@ -600,7 +600,6 @@ class CanvasTile:
 	
 	def get_terrain(self):
 		return ''.join(self.terrain_neighbours)
-
 
 class CanvasObject(pygame.sprite.Sprite):
 	def __init__(self, pos, frames, tile_id, origin, group):
