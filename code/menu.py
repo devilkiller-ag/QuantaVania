@@ -29,7 +29,7 @@ class Menu:
         menu_position = (WINDOW_WIDTH - (menu_size + menu_margin), WINDOW_HEIGHT - (menu_size + menu_margin)) # TOP_LEFT POSITION OF MENU
         self.menu_area = pygame.Rect(menu_position, (menu_size, menu_size))
 
-        ## Button Areas
+        ## Menu Button Areas
         button_margin = 5
         generic_button_area = pygame.Rect(self.menu_area.topleft, (self.menu_area.width / 2, self.menu_area.height / 2))
         self.tile_button_area = generic_button_area.copy().inflate(-button_margin, -button_margin)
@@ -37,12 +37,12 @@ class Menu:
         self.enemy_button_area = generic_button_area.copy().move(0, self.menu_area.height / 2).inflate(-button_margin, -button_margin)
         self.palm_button_area = generic_button_area.copy().move(self.menu_area.width / 2, self.menu_area.height / 2).inflate(-button_margin, -button_margin)
         
-        ## Create Buttons
+        ## Create Menu Buttons
         self.buttons = pygame.sprite.Group()
-        Button(self.tile_button_area, self.buttons, self.menu_surfaces['terrain'])
-        Button(self.coin_button_area, self.buttons, self.menu_surfaces['coin'])
-        Button(self.enemy_button_area, self.buttons, self.menu_surfaces['enemy'])
-        Button(self.palm_button_area, self.buttons, self.menu_surfaces['palm fg'], self.menu_surfaces['palm bg'])
+        MenuButton(self.tile_button_area, self.buttons, self.menu_surfaces['terrain'])
+        MenuButton(self.coin_button_area, self.buttons, self.menu_surfaces['coin'])
+        MenuButton(self.enemy_button_area, self.buttons, self.menu_surfaces['enemy'])
+        MenuButton(self.palm_button_area, self.buttons, self.menu_surfaces['palm fg'], self.menu_surfaces['palm bg'])
 
 
     def click(self, mouse_position, mouse_buttons):
@@ -76,8 +76,7 @@ class Menu:
         self.buttons.draw(self.menu_display_surface)
         self.highlight_indicator(index)
 
-
-class Button(pygame.sprite.Sprite):
+class MenuButton(pygame.sprite.Sprite):
     def __init__(self, rect, group, items, items_alt = None):
         super().__init__(group)
         
@@ -101,3 +100,13 @@ class Button(pygame.sprite.Sprite):
         button_surface = ((self.items['main' if self.main_active else 'alt'])[self.index])[1]
         button_area = button_surface.get_rect(center = (self.rect.width / 2, self.rect.height / 2))
         self.image.blit(button_surface, button_area)
+
+class Button(): ## For Editor Save Play Buttons
+    def __init__(self, type, x, y, image, display_surface):
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        self.display_surface = display_surface
+
+    def display(self):
+        self.display_surface.blit(self.image, (self.rect.x, self.rect.y))

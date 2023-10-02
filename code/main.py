@@ -6,6 +6,7 @@ from os import walk
 
 from settings import *
 from support import *
+from overworld import Overworld
 from editor import Editor
 from custom_level import CustomLevel
 
@@ -13,18 +14,66 @@ class Main:
 	def __init__(self):
 		pygame.init()
 		self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+		pygame.display.set_caption("QuantaVania")
 		self.clock = pygame.time.Clock()
 		self.import_graphics()
+
+		## Game Atributes
+		self.max_level = 1
+		self.status = 'overworld'
 
 		## Editor & Levels
 		self.editor_active = True
 		self.transition = Transition(self.toggle)
-		self.editor = Editor(self.land_tiles, self.switch)
+		self.editor = Editor(self.land_tiles, self.switch, self.create_overworld, self.max_level, self.max_level)
+
+		## Assets Data
+		self.asset_dictionary = {
+			'clouds': self.clouds,
+			'land': self.land_tiles,
+			'water bottom': self.water_bottom,
+			'water top': self.water_top_animation,
+			'gold': self.gold,
+			'silver': self.silver,
+			'diamond': self.diamond,
+			'particles': self.particles,
+			'palms': self.palms,
+			'spikes': self.spikes,
+			'crab_monster': self.crab_monster,
+			'shell': self.shell,
+			'pearl': self.pearl,
+			'player': self.player_graphics
+		}
+
+		## Import Saved Levels
+		self.all_levels = import_levels(SAVE_FOLDER_NAME)
+		# print(all_levels)
+
+		## Overworld
+		self.overworld = Overworld(self.all_levels, 0, self.max_level, self.display_surface, self.create_level)
 
 		## CURSOR
 		cursor_surface = loadImage('graphics/cursors/mouse.png').convert_alpha()
 		cursor = pygame.cursors.Cursor((0, 0), cursor_surface)
 		pygame.mouse.set_cursor(cursor)
+
+	def create_level(self, current_level):
+		self.custom_level = CustomLevel(
+			current_level, 
+			self.all_levels[f'level_{current_level}']['unlock'],
+			self.all_levels[f'level_{current_level}']['data'], 
+			self.switch, 
+			self.create_overworld, 
+			self.asset_dictionary, 
+			self.level_sounds
+		)
+		self.status = 'level'
+
+	def create_overworld(self, current_level, new_max_level):
+		if new_max_level > self.max_level:
+			self.max_level = new_max_level
+		self.overworld = Overworld(self.all_levels, current_level, self.max_level, self.display_surface, self.create_level)
+		self.status = 'overworld'
 
 	def import_graphics(self):
 		# clouds
@@ -62,43 +111,33 @@ class Main:
 		}
 
 	def toggle(self): # Toggle (Turn On/Off) between Editor, Levels, CustomLevel, & Menu
-		self.editor_active= not self.editor_active
+		self.editor_active = not self.editor_active
 		if self.editor_active:
 			self.editor.editor_music.play()
 	
 	def switch(self, custom_level_grid = None): # Switch between Editor, Levels, CustomLevel, & Menu
-		asset_dictionary = {
-			'clouds': self.clouds,
-			'land': self.land_tiles,
-			'water bottom': self.water_bottom,
-			'water top': self.water_top_animation,
-			'gold': self.gold,
-			'silver': self.silver,
-			'diamond': self.diamond,
-			'particles': self.particles,
-			'palms': self.palms,
-			'spikes': self.spikes,
-			'crab_monster': self.crab_monster,
-			'shell': self.shell,
-			'pearl': self.pearl,
-			'player': self.player_graphics
-		}
-
+		
 		sounds_dictionary = self.level_sounds
 
 		self.transition.active = True
 		if custom_level_grid:
-			self.custom_level = CustomLevel(custom_level_grid, self.switch, asset_dictionary, sounds_dictionary)
+			self.custom_level = CustomLevel(custom_level_grid, self.switch, self.create_overworld, self.asset_dictionary, sounds_dictionary)
 
 	def run(self):
 		while True:
 			dt = self.clock.tick() / 1000 # delta time
 			
-			if self.editor_active:
-				self.editor.run(dt)
-			else:
+			if self.status == 'overworld':
+				self.overworld.run(dt)
+			elif self.status == 'level':
 				self.custom_level.run(dt)
-			
+			else: # self.status == 'editor'
+				self.editor.run(dt)
+			# 	if self.editor_active:
+			# 		self.editor.run(dt)
+			# 	else:
+			# 		self.custom_level.run(dt)
+
 			self.transition.display(dt)
 			pygame.display.update()
 

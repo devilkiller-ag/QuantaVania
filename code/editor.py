@@ -8,16 +8,20 @@ from random import choice, randint
 
 from settings import *
 from support import *
-from menu import Menu
+from menu import Menu, Button
 from timer import Timer
+from save_load_manager import SaveLoadSystem
 
 class Editor:
-	def __init__(self, land_tiles, switch):
+	def __init__(self, land_tiles, switch, create_overworld, current_level , new_max_level):
 
 		## main setup 
 		self.editor_display_surface = pygame.display.get_surface()
 		self.canvas_data = {}
 		self.switch = switch
+		self.create_overworld = create_overworld
+		self.current_level = current_level
+		self.new_max_level = new_max_level
 
 		## imported graphics
 		self.land_tiles = land_tiles
@@ -77,10 +81,17 @@ class Editor:
 		self.editor_music.set_volume(0.4)
 		self.editor_music.play(loops = -1)
 
+		## Save/Load Manager
+		self.saveloadmanager = SaveLoadSystem(".qvania", "saved_levels")
+		self.save_level_button = Button('save', WINDOW_WIDTH - (BUTTON_SIZE + BUTTON_MARGIN), BUTTON_MARGIN, self.save_button, self.editor_display_surface)
+		self.play_level_button = Button('play', BUTTON_MARGIN, BUTTON_MARGIN, self.play_button, self.editor_display_surface)
+
 	### SUPPORT FUNCTIONS
 	def import_graphics(self):
 		self.water_bottom = loadImage('graphics/terrain/water/water_bottom.png').convert_alpha()
 		self.sky_handle = loadImage('graphics/cursors/handle.png').convert_alpha()
+		self.save_button = loadImage('graphics/save_btn.png').convert_alpha()
+		self.play_button = loadImage('graphics/play_btn.png').convert_alpha()
 		
 		# import animations
 		self.animations = {} # Ex: {3: {'frame index': 0, 'frames': [graphics_surfaces_01, graphics_surface_02], 'length': 2}}
@@ -222,9 +233,10 @@ class Editor:
 				sys.exit()
 
 			# Switch to Play Mode When user press ENTER (EXPORT MAP AND CREATE ACTUAL LEVEL)
-			if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-				self.switch(self.create_grid())
-				self.editor_music.stop()
+			# if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+			# 	self.editor_music.stop()
+			# 	export_layer_data = self.create_grid()
+			# 	self.switch(export_layer_data)
 			
 			self.pan_input(event) # pass the event to pan_input to detect if user wants to pan the editor area and act accordingly
 			self.selection_hotkeys(event)
@@ -274,11 +286,32 @@ class Editor:
 		self.selection_index = max(2, min(self.selection_index, 18)) # To limit the selection index between 2 to 18 (because between that's what editor data have index)
 
 	def menu_click(self, event):
-		if event.type == pygame.MOUSEBUTTONDOWN and self.menu.menu_area.collidepoint(mouse_postion()):
-			self.selection_index = self.menu.click(mouse_postion(), mouse_buttons())
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			if self.menu.menu_area.collidepoint(mouse_postion()):
+				self.selection_index = self.menu.click(mouse_postion(), mouse_buttons())
+			
+			# Save the Level When user press ENTER (EXPORT MAP AND CREATE ACTUAL LEVEL)
+			if self.save_level_button.rect.collidepoint(mouse_postion()):
+				if mouse_buttons()[2]: # right mouse click
+					export_layer_data = self.create_grid()
+					###################### INPUT #################
+					self.saveloadmanager.save_data(export_layer_data, "level_4")
+					self.create_overworld(self.current_level, self.new_max_level)
+
+			# Switch to Play Mode When user press Play Button (EXPORT MAP AND CREATE ACTUAL LEVEL)
+			# if self.play_level_button.rect.collidepoint(mouse_postion()):
+			# 	if mouse_buttons()[2]: # right mouse click
+			# 		self.editor_music.stop()
+			# 		export_layer_data = self.create_grid()
+			# 		self.switch(export_layer_data)
 
 	def canvas_add(self):
-		if mouse_buttons()[0] and not self.menu.menu_area.collidepoint(mouse_postion()) and not self.object_drag_active: # if we are left clicking outside the menu area and we have not selected any object(Player, Trees)
+		if (
+			mouse_buttons()[0] and 
+			not self.menu.menu_area.collidepoint(mouse_postion()) and 
+			not self.save_level_button.rect.collidepoint(mouse_postion()) and 
+			not self.object_drag_active
+		): # if we are left clicking outside the menu area and we have not selected any object(Player, Trees)
 			current_cell = self.get_current_cell()
 
 			if EDITOR_DATA[self.selection_index]['type'] == 'tile': ## ADD TILE
@@ -305,8 +338,11 @@ class Editor:
 
 	def canvas_remove(self):
 
-		if mouse_buttons()[2] and not self.menu.menu_area.collidepoint(mouse_postion()): # if we are right clicking outside the menu area
-			
+		if (
+			mouse_buttons()[2] and 
+			not self.menu.menu_area.collidepoint(mouse_postion()) and 
+			not self.save_level_button.rect.collidepoint(mouse_postion())
+		): # if we are right clicking outside the menu area
 			## delete objects
 			selected_object = self.mouse_on_which_object()
 			if selected_object:
@@ -555,6 +591,8 @@ class Editor:
 		# pygame.draw.circle(self.editor_display_surface, 'red', self.origin, 10)
 		self.preview()
 		self.menu.display(self.selection_index)
+		self.save_level_button.display()
+		self.play_level_button.display()
 
 class CanvasTile:
 	def __init__(self, tile_id, object_offset_from_tile_origin = vector()):

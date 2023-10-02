@@ -73,3 +73,11 @@ BUTTON_LINE_COLOR = '#f5f1de'
 
 # player settings
 PLAYER_SPEED = 300
+
+# buttons
+BUTTON_SIZE = 50
+BUTTON_MARGIN = 6
+
+# Saving Levels Settings
+SAVE_FILE_EXTENSION = '.qvania'
+SAVE_FOLDER_NAME = 'saved_levels'
