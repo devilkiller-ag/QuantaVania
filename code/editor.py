@@ -11,7 +11,6 @@ from support import *
 from menu import Menu
 from timer import Timer
 
-
 class Editor:
 	def __init__(self, land_tiles, switch):
 
@@ -72,6 +71,11 @@ class Editor:
 			origin = self.origin, 
 			group = [self.canvas_objects, self.background_objects]
 		)
+
+		## Editor Background Music
+		self.editor_music = pygame.mixer.Sound('audio/Explorer.ogg')
+		self.editor_music.set_volume(0.4)
+		self.editor_music.play(loops = -1)
 
 	### SUPPORT FUNCTIONS
 	def import_graphics(self):
@@ -220,6 +224,7 @@ class Editor:
 			# Switch to Play Mode When user press ENTER (EXPORT MAP AND CREATE ACTUAL LEVEL)
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
 				self.switch(self.create_grid())
+				self.editor_music.stop()
 			
 			self.pan_input(event) # pass the event to pan_input to detect if user wants to pan the editor area and act accordingly
 			self.selection_hotkeys(event)
@@ -248,7 +253,10 @@ class Editor:
 			else:
 				# scroll up to go towards right and scroll down to go towards left
 				self.origin.x -= event.y * 50 # 50 is a factor for making movement little large on mouse scroll (hit & trail)
-		
+			
+			for sprite in self.canvas_objects: # update position of all sprites
+				sprite.pan_position(self.origin)
+
 		# panning update
 		if self.pan_active:
 			self.origin = vector(mouse_postion()) - self.pan_offset # update origin

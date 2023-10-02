@@ -27,6 +27,9 @@ class Main:
 		pygame.mouse.set_cursor(cursor)
 
 	def import_graphics(self):
+		# clouds
+		self.clouds = import_images_from_folder('graphics/clouds')
+		
 		# terrains
 		self.land_tiles = import_images_from_folder_as_dict('graphics/terrain/land')
 		self.water_bottom = loadImage('graphics/terrain/water/water_bottom.png').convert_alpha()
@@ -45,16 +48,27 @@ class Main:
 		self.spikes = loadImage('graphics/enemies/spikes/spikes.png').convert_alpha()
 		self.crab_monster = {folder: import_images_from_folder(f'graphics/enemies/crab_monster/{folder}') for folder in list(walk('graphics/enemies/crab_monster'))[0][1]}
 		self.shell = {folder: import_images_from_folder(f'graphics/enemies/shell_left/{folder}') for folder in list(walk('graphics/enemies/shell_left'))[0][1]} # only importing shell_left as we can easily get all the graphics of shell_right by flipping the graphics of shell_left
+		self.pearl = loadImage('graphics/enemies/pearl/pearl.png').convert_alpha()
 
 		# player
 		self.player_graphics = {folder: import_images_from_folder(f'graphics/player/{folder}') for folder in list(walk('graphics/player'))[0][1]}
 
+		# sounds
+		self.level_sounds = {
+			'coin': pygame.mixer.Sound('audio/coin.wav'),
+			'hit': pygame.mixer.Sound('audio/hit.wav'),
+			'jump': pygame.mixer.Sound('audio/jump.wav'),
+			'music': pygame.mixer.Sound('audio/SuperHero.ogg')
+		}
 
 	def toggle(self): # Toggle (Turn On/Off) between Editor, Levels, CustomLevel, & Menu
 		self.editor_active= not self.editor_active
+		if self.editor_active:
+			self.editor.editor_music.play()
 	
 	def switch(self, custom_level_grid = None): # Switch between Editor, Levels, CustomLevel, & Menu
 		asset_dictionary = {
+			'clouds': self.clouds,
 			'land': self.land_tiles,
 			'water bottom': self.water_bottom,
 			'water top': self.water_top_animation,
@@ -66,12 +80,15 @@ class Main:
 			'spikes': self.spikes,
 			'crab_monster': self.crab_monster,
 			'shell': self.shell,
+			'pearl': self.pearl,
 			'player': self.player_graphics
 		}
 
+		sounds_dictionary = self.level_sounds
+
 		self.transition.active = True
 		if custom_level_grid:
-			self.custom_level = CustomLevel(custom_level_grid, self.switch, asset_dictionary)
+			self.custom_level = CustomLevel(custom_level_grid, self.switch, asset_dictionary, sounds_dictionary)
 
 	def run(self):
 		while True:
