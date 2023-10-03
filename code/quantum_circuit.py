@@ -160,6 +160,26 @@ class QuantumCircuitGridModel():
     def __init__(self, num_qubits, num_columns):
         self.num_qubits = num_qubits
         self.num_columns = num_columns
+        self.nodes = np.zeros(
+            (self.circuit_grid_model.max_wires, self.circuit_grid_model.max_columns),
+            dtype=QuantumCircuitGridNode
+        )
+    
+    def __str__(self):
+        string = "CircuitGridModel:\n"
+        for wire in range(self.num_qubits):
+            row_values = [str(self.get_gate_at_node(wire, column)) for column in range(self.num_columns)]
+            string += ", ".join(row_values) + "\n"
+        return string
+
+    def set_node(self, wire, column, qc_grid_node):
+        self.nodes[wire][column] = QuantumCircuitGrid(
+            qc_grid_node.node_type,
+            qc_grid_node.radians,
+            qc_grid_node.ctrl_above,
+            qc_grid_node.ctrl_below,
+            qc_grid_node.swap
+        )
 
 class QuantumCircuitGrid(pygame.sprite.RenderPlain):
     def __init__(self, position):
