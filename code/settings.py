@@ -70,6 +70,8 @@ HORIZON_TOP_COLOR = '#d1aa9d'
 LINE_COLOR = 'black'
 BUTTON_BG_COLOR = '#33323d'
 BUTTON_LINE_COLOR = '#f5f1de'
+QUANTUM_CIRCUIT_COLOR_COLOR = '444654'
+QUANTUM_CIRCUIT_WIRE_COLOR = '#ffffff'
 
 # player settings
 PLAYER_SPEED = 300
@@ -81,3 +83,37 @@ BUTTON_MARGIN = 6
 # Saving Levels Settings
 SAVE_FILE_EXTENSION = '.qvania'
 SAVE_FOLDER_NAME = 'saved_levels'
+
+## Quantum Circuit Grid for Player/Enemy Shooting
+BASIS_STATES = {
+    1: [
+        '|0>', 
+        '|1>'
+    ],
+    2: [
+        '|00>',
+        '|01>',
+        '|10>',
+        '|11>'
+    ],
+    3: [
+        '|000>',
+        '|001>',
+        '|010>',
+        '|011>',
+        '|100>',
+        '|101>',
+        '|110>',
+        '|111>'
+    ]
+}
+
+QUANTUM_CIRCUIT_TILE_SIZE = 36
+GATE_TILE_WIDTH = 24
+GATE_TILE_HIEGHT = 24
+WIRE_LINE_WIDTH = 1
+
+QUANTUM_CIRCUIT_MARKER_MOVE_LEFT = 1
+QUANTUM_CIRCUIT_MARKER_MOVE_RIGHT = 2
+QUANTUM_CIRCUIT_MARKER_MOVE_UP = 3
+QUANTUM_CIRCUIT_MARKER_MOVE_DOWN = 4
