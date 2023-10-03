@@ -113,3 +113,35 @@ class QuantumCircuitGridGate(pygame.sprite.Sprite):
                 pygame.draw.arc(self.gate_surface, QUANTUM_GATE_PHASE_COLOR, self.gate_rect, 0, node.radians % (2 * np.pi), 4)
             else: # Else if this is a normal Y Gate
                 self.gate_surface, self.gate_rect = self.import_gate("z_gate.png", -1)
+        
+        elif gate == GATES['S']:
+            self.gate_surface, self.gate_rect = self.import_gate("s_gate.png", -1)
+
+        elif gate == GATES['H']:
+            self.gate_surface, self.gate_rect = self.import_gate("h_gate.png", -1)
+    
+    def run(self):
+        self.draw_gate()
+
+class QuantumCircuitGridModel():
+    def __init__(self, num_qubits, num_columns):
+        self.num_qubits = num_qubits
+        self.num_columns = num_columns
+
+class QuantumCircuitGrid(pygame.sprite.RenderPlain):
+    def __init__(self, position):
+        super().__init__()
+        
+        ## State
+        self.position = position
+        self.current_wire = 0
+        self.current_column = 0
+        
+        self.qc_grid_model = QuantumCircuitGridModel()
+        self.circuit_grid_background = QuantumCircuitGridBackground()
+        self.circuit_grid_background = QuantumCircuitGridMarker()
+
+        self.gate_tiles = np.zeros(
+            (self.circuit_grid_model.max_wires, self.circuit_grid_model.max_columns),
+            dtype=QuantumCircuitGridGate
+        )

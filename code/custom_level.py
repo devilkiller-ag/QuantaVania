@@ -8,9 +8,10 @@ from support import *
 from sprites import Generic, CollidableBlock, Cloud, AnimatedSprite, ParticleEffect, Coin, Spikes, CrabMonster, Shell, Player
 
 class CustomLevel:
-    def __init__(self, level_grid, switch, asset_dictionary, audio):
+    def __init__(self, current_level, new_max_level, level_grid, switch, create_overworld, asset_dictionary, audio):
         self.level_display_surface = pygame.display.get_surface()
         self.switch = switch
+        self.level_grid = level_grid
 
         ## Objects/Sprites: Player, Trees
         self.all_sprites = CameraGroup()
@@ -24,7 +25,7 @@ class CustomLevel:
         ## Level Limits
         self.level_limits = {
             'left': -WINDOW_WIDTH,
-            'right': (sorted(list(level_grid['terrain'].keys()), key = lambda pos: pos[0])[-1])[0] + 500 if level_grid['terrain'] else 1800 # x of rightmost terrain tile + offset(500)
+            'right': (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[-1])[0] + 500 if level_grid['terrain'] else 1800 # x of rightmost terrain tile + offset(500)
         }
 
         ## Additional Stuffs
@@ -44,6 +45,11 @@ class CustomLevel:
 
         self.hit_sound = audio['hit']
         self.hit_sound.set_volume(0.3)
+
+        ## Overworld
+        self.create_overworld = create_overworld
+        self.current_level = current_level
+        self.new_max_level = new_max_level
 
     def build_level(self, level_grid, asset_dictionary, jump_sound):
         for layer_name, layer in level_grid.items():
@@ -162,6 +168,16 @@ class CustomLevel:
             self.hit_sound.play()
             self.player.damage()
 
+    def check_death(self):
+        if self.player.position.y > WINDOW_HEIGHT:
+            self.bg_music.stop()
+            self.create_overworld(self.current_level, 0)
+			
+    def check_win(self):
+        if self.player.position.x >= (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[-1])[0] - 100:
+            self.bg_music.stop()
+            self.create_overworld(self.current_level, self.new_max_level)
+
     def event_loop(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -170,7 +186,8 @@ class CustomLevel:
             
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.bg_music.stop()
-                self.switch() 
+                # self.switch()
+                self.create_overworld(2, 3)
             
             if event.type == self.cloud_timer:
                 self.create_cloud()
@@ -181,6 +198,8 @@ class CustomLevel:
         self.all_sprites.update(dt)
         self.get_coins()
         self.get_damage()
+        self.check_death()
+        self.check_win()
 
         ## draw
         self.level_display_surface.fill(SKY_COLOR)
