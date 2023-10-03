@@ -92,7 +92,7 @@ class QuantumCircuitGridGate(pygame.sprite.Sprite):
                 # Draw the value of theta as an arc of a circle 
                 pygame.draw.arc(self.gate_surface, QUANTUM_GATE_PHASE_COLOR, self.gate_rect, 0, node.radians % (2 * np.pi), 4)
             else: # Else if this is a normal X Gate
-                self.gate_surface, self.gate_rect = self.import_gate("rx_gate.png", -1)
+                self.gate_surface, self.gate_rect = self.import_gate("x_gate.png", -1)
         
         elif gate == GATES['Y']:
             node = self.qc_grid_model.get_node(self.wire, self.column)
@@ -102,5 +102,14 @@ class QuantumCircuitGridGate(pygame.sprite.Sprite):
                 # Draw the value of theta as an arc of a circle 
                 pygame.draw.arc(self.gate_surface, QUANTUM_GATE_PHASE_COLOR, self.gate_rect, 0, node.radians % (2 * np.pi), 4)
             else: # Else if this is a normal Y Gate
-                self.gate_surface, self.gate_rect = self.import_gate("ry_gate.png", -1)
+                self.gate_surface, self.gate_rect = self.import_gate("y_gate.png", -1)
         
+        elif gate == GATES['Z']:
+            node = self.qc_grid_model.get_node(self.wire, self.column)
+            # Check if this is a RY Gate
+            if node.radians != 0:
+                self.gate_surface, self.gate_rect = self.import_gate("rz_gate.png", -1)
+                # Draw the value of theta as an arc of a circle 
+                pygame.draw.arc(self.gate_surface, QUANTUM_GATE_PHASE_COLOR, self.gate_rect, 0, node.radians % (2 * np.pi), 4)
+            else: # Else if this is a normal Y Gate
+                self.gate_surface, self.gate_rect = self.import_gate("z_gate.png", -1)
