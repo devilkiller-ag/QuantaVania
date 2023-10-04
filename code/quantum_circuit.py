@@ -76,10 +76,13 @@ class QuantumCircuitGridGate(pygame.sprite.Sprite):
             gate_image.set_colorkey(colorkey)
         return gate_image, gate_image.get_rect()
 
-    def draw_gate(self):
+    def load_gate(self):
         gate = self.qc_grid_model.get_node_gate(self.wire, self.column)
         
-        if gate == GATES['X']:
+        if gate == GATES['IDEN']:
+            self.gate_surface, self.gate_rect = self.import_gate("iden_gate.png", -1)    
+        
+        elif gate == GATES['X']:
             node = self.qc_grid_model.get_node(self.wire, self.column)
             # Check if this is a CNOT Gate
             if node.ctrl_above >= 0 or node.ctrl_below >= 0:
@@ -116,17 +119,67 @@ class QuantumCircuitGridGate(pygame.sprite.Sprite):
         
         elif gate == GATES['S']:
             self.gate_surface, self.gate_rect = self.import_gate("s_gate.png", -1)
+        
+        elif gate == GATES['SDG']:
+            self.gate_surface, self.gate_rect = self.import_gate("sdg_gate.png", -1)
+        
+        elif gate == GATES['T']:
+            self.gate_surface, self.gate_rect = self.import_gate("t_gate.png", -1)
+        
+        elif gate == GATES['TDG']:
+            self.gate_surface, self.gate_rect = self.import_gate("tdg_gate.png", -1)
 
         elif gate == GATES['H']:
             self.gate_surface, self.gate_rect = self.import_gate("h_gate.png", -1)
-    
+        
+        elif gate == GATES['SWAP']:
+            self.gate_surface, self.gate_rect = self.import_gate("swap_gate.png", -1)
+        
+        elif gate == GATES['CTRL']:
+            # Check if the target wire is above the control wire
+            if self.wire > self.qc_grid_model.get_control_wire_for_target_gate_at(self.wire, self.column):
+                self.gate_surface, self.gate_rect = self.import_gate("ctrl_gate_bottom_wire.png", -1)
+            else: # if the target wire is above the control wire
+                self.gate_surface, self.gate_rect = self.import_gate("ctrl_gate_top_wire.png", -1)
+        
+        elif gate == GATES['CTRL_LINE']:
+            self.gate_surface, self.gate_rect = self.import_gate("ctrl_line_gate.png", -1)
+        
+        else: # If the node is empty
+            # Draw a transparent block, i.e., empty gate/node
+            self.gate_surface = pygame.Surface([GATE_TILE_WIDTH, GATE_TILE_HIEGHT])
+            self.gate_surface.set_alpha(0)
+            self.rect = self.image.get_rect()
+        
+        self.gate_surface.convert()
+
     def run(self):
-        self.draw_gate()
+        self.load_gate()
 
 class QuantumCircuitGridModel():
     def __init__(self, num_qubits, num_columns):
         self.num_qubits = num_qubits
         self.num_columns = num_columns
+        self.nodes = np.zeros(
+            (self.circuit_grid_model.max_wires, self.circuit_grid_model.max_columns),
+            dtype=QuantumCircuitGridNode
+        )
+    
+    def __str__(self):
+        string = "CircuitGridModel:\n"
+        for wire in range(self.num_qubits):
+            row_values = [str(self.get_gate_at_node(wire, column)) for column in range(self.num_columns)]
+            string += ", ".join(row_values) + "\n"
+        return string
+
+    def set_node(self, wire, column, qc_grid_node):
+        self.nodes[wire][column] = QuantumCircuitGrid(
+            qc_grid_node.node_type,
+            qc_grid_node.radians,
+            qc_grid_node.ctrl_above,
+            qc_grid_node.ctrl_below,
+            qc_grid_node.swap
+        )
 
 class QuantumCircuitGrid(pygame.sprite.RenderPlain):
     def __init__(self, position):
