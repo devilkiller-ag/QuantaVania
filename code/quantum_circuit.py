@@ -231,7 +231,7 @@ class QuantumCircuitGridModel():
                         qc.i(qr[wire])
 
                     elif node.gate_type == GATES['X']:
-                        if node.rotation_angle == 0: # Node have a normal X Gate
+                        if node.rotation_angle == 0: # Node have a Pauli X Gate or Controlled X Gate or Toffoli Gate
                             if node.first_ctrl != -1: # If first control is active
                                 if node.second_ctrl != -1: # If second control is also active then node have a Toffoli Gate
                                     qc.ccx(qr[node.frist_ctrl], qr[node.second_ctrl], qr[wire])
@@ -242,8 +242,45 @@ class QuantumCircuitGridModel():
                         else: # If angle is not zero then it is a RX Gate
                             qc.rx(node.rotation_angle, qr[wire])
                     
+                    elif node.gate_type == GATES['Y']:
+                        if node.rotation_angle == 0: # Node have a Pauli Y Gate or Controlled Y Gate
+                            if node.first_ctrl != -1: # If first control is active then Node have a CY Gate
+                                qc.cy(qr[self.first_ctrl], qr[wire])
+                            else: # If no control is active then the node have a Pauli Y Gate
+                                qc.y(qr[wire])
                     
-
+                    elif node.gate_type == GATES['Z']:
+                        if node.rotation_angle == 0: # Node have a Pauli Z Gate or Controlled Z Gate
+                            if node.first_ctrl != -1: # If first control is active then Node have a CZ Gate
+                                qc.cz(qr[self.first_ctrl], qr[wire])
+                            else: # If no control is active then the node have a Pauli Z Gate
+                                qc.z(qr[wire])
+                    
+                    elif node.gate_type == GATES['S']:
+                        qc.s(qr[wire])
+                    
+                    elif node.gate_type == GATES['SDG']:
+                        qc.sdg(qr[wire])
+                    
+                    elif node.gate_type == GATES['T']:
+                        qc.t(qr[wire])
+                    
+                    elif node.gate_type == GATES['TDG']:
+                        qc.tdg(qr[wire])
+                    
+                    elif node.gate_type == GATES['H']:
+                        if node.first_ctrl != -1: # If first control is active then Node have a CH Gate
+                            qc.ch(qr[self.first_ctrl], qr[wire])
+                        else: # If no control is active then the node have a H Gate
+                            qc.h(qr[wire])
+                    
+                    elif node.gate_type == GATES['SWAP']:
+                        if node.first_ctrl != -1: # If first control is active then Node have a Controlled Swap Gate
+                            qc.cswap(qr[self.first_ctrl], qr[wire])
+                        else: # If no control is active then the node have a Swap Gate
+                            qc.swap(qr[wire])
+        
+        return qc
 
 
 class QuantumCircuitGrid(pygame.sprite.RenderPlain):
