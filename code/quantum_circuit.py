@@ -47,8 +47,8 @@ class QuantumCircuitGridNode:
     def __init__(self, gate_type, rotation_angle = 0.0, first_ctrl = -1, second_ctrl = -1, swap = -1):
         self.gate_type = gate_type # What Gate is at this node
         self.rotation_angle = rotation_angle # If radian != 0 then this node have a U(theta) gate; Ex:- RX, RY, RZ
-        self.first_ctrl = first_ctrl # If first_ctrl > 0; then this node is a controlled gate with one control node
-        self.second_ctrl = second_ctrl # If second_ctrl > 0; then this node is a controlled gate with two control nodes
+        self.first_ctrl = first_ctrl # If first_ctrl > 0; then this node is a controlled gate with one control node # It's value will be the wire number on which the first control is placed
+        self.second_ctrl = second_ctrl # If second_ctrl > 0; then this node is a controlled gate with two control nodes # It's value will be the wire number on which the second control is placed
         self.swap = swap # If swap != -1 then this node have a swap gate
 
     def __str__(self):
@@ -75,7 +75,7 @@ class QuantumCircuitGridGate(pygame.sprite.Sprite):
                 colorkey = gate_image.get_at((0,0))
             gate_image.set_colorkey(colorkey)
         return gate_image, gate_image.get_rect()
-
+    
     def load_gate(self):
         gate = self.qc_grid_model.get_node_gate(self.wire, self.column)
         
@@ -128,7 +128,7 @@ class QuantumCircuitGridGate(pygame.sprite.Sprite):
         
         elif gate == GATES['TDG']:
             self.gate_surface, self.gate_rect = self.import_gate("tdg_gate.png", -1)
-
+        
         elif gate == GATES['H']:
             self.gate_surface, self.gate_rect = self.import_gate("h_gate.png", -1)
         
@@ -217,8 +217,8 @@ class QuantumCircuitGridModel():
         
         return control_wire
 
-    def compute_quantum_circuit(self):
-        """Create and Compute Quantum Circuit from Quantum Circuit Grid"""
+    def create_quantum_circuit(self):
+        """Create Quantum Circuit from Quantum Circuit Grid"""
         qr = QuantumRegister(self.num_qubits, "q")
         qc = QuantumCircuit(qr)
 
@@ -282,9 +282,8 @@ class QuantumCircuitGridModel():
         
         return qc
 
-
 class QuantumCircuitGrid(pygame.sprite.RenderPlain):
-    def __init__(self, position):
+    def __init__(self, position, num_qubits, num_columns):
         super().__init__()
         
         ## State
@@ -292,11 +291,271 @@ class QuantumCircuitGrid(pygame.sprite.RenderPlain):
         self.current_wire = 0
         self.current_column = 0
         
-        self.qc_grid_model = QuantumCircuitGridModel()
-        self.circuit_grid_background = QuantumCircuitGridBackground()
-        self.circuit_grid_background = QuantumCircuitGridMarker()
+        self.qc_grid_model = QuantumCircuitGridModel(num_qubits, num_columns)
+        self.qc_grid_background = QuantumCircuitGridBackground(self.qc_grid_model)
+        self.qc_grid_cursor = QuantumCircuitGridMarker()
 
         self.gate_tiles = np.zeros(
             (self.circuit_grid_model.max_wires, self.circuit_grid_model.max_columns),
             dtype=QuantumCircuitGridGate
         )
+    
+    ## SUPPORT FUNCTIONS
+    def highlight_current_node(self, wire, column):
+        self.current_wire = wire
+        self.current_column = column
+        self.qc_grid_cursor.rect.topleft = (
+            self.position[0] + QUANTUM_CIRCUIT_TILE_SIZE * (self.current_column + 1),
+            self.position[1] + QUANTUM_CIRCUIT_TILE_SIZE * (self.current_wire + 0.5)
+        )
+    
+    def get_gate_at_current_node(self):
+        return self.qc_grid_model.get_gate_at_node(self.current_wire, self.current_column)
+    
+    ## HANDLE UPDATES    
+    def update_sprites(self):
+        for sprite in self.sprites():
+            sprite.update()
+    
+    def update_qc_grid_background(self):
+        self.qc_grid_background.rect.topleft = self.position
+    
+    def updage_gate_tiles(self):
+        for wire in range(self.qc_grid_model.num_qubits):
+            for column in range(self.qc_grid_model.num_columns):
+                gate_tile = self.gate_tiles[wire][column]
+                gate_tile.rect.center = (
+                    self.position[0] + QUANTUM_CIRCUIT_TILE_SIZE * (column + 1.5),
+                    self.position[1] + QUANTUM_CIRCUIT_TILE_SIZE * (wire + 1)
+                )
+    
+    def update(self):
+        self.update_sprites()
+        self.update_qc_grid_background()
+        self.updage_gate_tiles()
+        self.highlight_current_node(self.current_wire, self.current_column)
+    
+    ## HANDLE INPUTS
+    def handle_input_x(self):
+        gate_at_current_node = self.get_gate_at_current_node()
+        if gate_at_current_node == GATES['EMPTY']:
+            qc_grid_node = QuantumCircuitGridNode(GATES['X'])
+            self.qc_grid_model.set_node(self.current_wire, self.current_column, qc_grid_node)
+        self.update()
+    
+    def handle_input_y(self):
+        gate_at_current_node = self.get_gate_at_current_node()
+        if gate_at_current_node == GATES['EMPTY']:
+            qc_grid_node = QuantumCircuitGridNode(GATES['Y'])
+            self.qc_grid_model.set_node(self.current_wire, self.current_column, qc_grid_node)
+        self.update()
+    
+    def handle_input_z(self):
+        gate_at_current_node = self.get_gate_at_current_node()
+        if gate_at_current_node == GATES['EMPTY']:
+            qc_grid_node = QuantumCircuitGridNode(GATES['Z'])
+            self.qc_grid_model.set_node(self.current_wire, self.current_column, qc_grid_node)
+        self.update()
+    
+    def handle_input_h(self):
+        gate_at_current_node = self.get_gate_at_current_node()
+        if gate_at_current_node == GATES['EMPTY']:
+            qc_grid_node = QuantumCircuitGridNode(GATES['H'])
+            self.qc_grid_model.set_node(self.current_wire, self.current_column, qc_grid_node)
+        self.update()
+    
+    def handle_input_delete(self, wire, column):
+        gate_at_current_node = self.qc_grid_model.get_gate_at_node(wire, column)
+        if(
+            gate_at_current_node == GATES['X']
+            or gate_at_current_node == GATES['Y']
+            or gate_at_current_node == GATES['Z']
+            or gate_at_current_node == GATES['H']
+        ):
+            self.delete_controls_for_gate(wire, column)
+
+        if gate_at_current_node == GATES['CTRL']:
+            gate_wire = self.qc_grid_model.get_wire_for_control_node_at(wire, column)
+            if gate_wire >= 0:
+                self.delete_controls_for_gate(gate_wire, column)
+        elif (
+            gate_at_current_node != GATES['CTRL']
+            and gate_at_current_node != GATES['SWAP']
+            and gate_at_current_node != GATES['CTRL_LINE']
+        ):
+            qc_grid_node = QuantumCircuitGridNode(GATES['EMPTY'])
+            self.qc_grid_model.set_node(wire, column, qc_grid_node)
+        
+        self.update()
+
+    def handle_input_clear_all(self):
+        for wire in range(self.qc_grid_model.num_qubits):
+            for column in range(self.qc_grid_model.num_columns):
+                self.handle_input_delete(wire, column)
+
+    def handle_input_ctrl(self):
+        gate_at_current_node = self.get_gate_at_current_node()
+        if(
+            gate_at_current_node == GATES['X']
+            or gate_at_current_node == GATES['Y']
+            or gate_at_current_node == GATES['Z']
+            or gate_at_current_node == GATES['H']
+        ):
+            qc_grid_node = self.qc_grid_model.get_node(self.current_wire, self.current_column)
+            if qc_grid_node.first_ctrl >= 0:
+                # Gate have a control qubit so remove it
+                orignal_first_ctrl = qc_grid_node.first_ctrl
+                qc_grid_node.first_ctrl = -1
+                self.qc_grid_model.set_node(self.current_wire, self.current_column, qc_grid_node)
+
+                # Remove Control Line Nodes
+                for wire in range(
+                    min(self.current_wire, orignal_first_ctrl) + 1,
+                    max(self.current_column, orignal_first_ctrl)
+                ):
+                    if(self.qc_grid_model.get_gate_at_node(wire, self.current_column) == GATES['CTRL_LINE']):
+                        self.qc_grid_model.set_node(wire, self.current_column, QuantumCircuitGridNode(GATES['EMPTY']))
+                self.update()
+        else:
+            # Attempt to place a control qubit beginning with the wire above
+            if self.current_wire >= 0:
+                if (self.place_ctrl_qubit(self.current_wire, self.current_wire - 1) == -1):
+                    if self.current_wire < self.qc_grid_model.num_qubits:
+                        if(self.place_ctrl_qubit(self.current_wire, self.current_wire + 1) == -1):
+                            print("Can't place control qubit!")
+                            self.display_exceptional_condition()
+
+    def handle_input_move_ctrl(self, direction):
+        gate_at_current_node = self.get_gate_at_current_node()
+        if(
+            gate_at_current_node == GATES['X']
+            or gate_at_current_node == GATES['Y']
+            or gate_at_current_node == GATES['Z']
+            or gate_at_current_node == GATES['H']
+        ):
+            qc_grid_node = self.qc_grid_model.get_node(self.current_wire, self.current_column)
+            if 0 <= qc_grid_node.first_ctrl < self.qc_grid_model.num_qubits:
+                # Gate already has a control qubit so try to move it
+                if direction == QUANTUM_CIRCUIT_MARKER_MOVE_UP:
+                    candidate_ctrl_wire = qc_grid_node.first_ctrl - 1
+                    if candidate_ctrl_wire == self.current_wire:
+                        candidate_ctrl_wire -= 1 # move up to previous wire above
+                else:
+                    candidate_ctrl_wire = qc_grid_node.first_ctrl + 1
+                    if candidate_ctrl_wire == self.current_wire:
+                        candidate_ctrl_wire += 1 # Move down to next wire below
+            
+                if 0 <= candidate_ctrl_wire < self.qc_grid_model.num_qubits:
+                    if (self.place_ctrl_quabit(self.current_wire, candidate_ctrl_wire) == candidate_ctrl_wire):
+                        if (direction == QUANTUM_CIRCUIT_MARKER_MOVE_UP and candidate_ctrl_wire < self.current_wire):
+                            if (self.qc_grid_model.get_gate_at_node(candidate_ctrl_wire + 1, self.current_column) == GATES['EMPTY']):
+                                self.qc_grid_model.set_node(candidate_ctrl_wire + 1, self.current_column, QuantumCircuitGridNode(GATES['CTRL_LINE']))
+                        elif(direction == QUANTUM_CIRCUIT_MARKER_MOVE_DOWN and candidate_ctrl_wire > self.current_wire):
+                            if (self.qc_grid_model.get_gate_at_node(candidate_ctrl_wire - 1, self.current_column) == GATES['EMPTY']):
+                                self.qc_grid_model.set_node(candidate_ctrl_wire - 1, self.current_column, QuantumCircuitGridNode(GATES['CTRL_LINE']))
+                        
+                        print("Control qubit placed on the wire ", candidate_ctrl_wire, " successfully!")
+                        self.update()
+                    
+                    else:
+                        print("Control qubit could not be placed on the wire ", candidate_ctrl_wire, " successfully!")
+
+    def handle_input_rotate(self, rotation_angle):
+        gate_at_current_node = self.get_gate_at_current_node()
+        if(
+            gate_at_current_node == GATES['X']
+            or gate_at_current_node == GATES['Y']
+            or gate_at_current_node == GATES['Z']
+        ):
+            qc_grid_node = self.qc_grid_model.get_node(self.current_wire, self.current_column)
+            qc_grid_node.rotation_angle = (qc_grid_node.rotation_angle + rotation_angle) % 2 * np.pi
+            self.qc_grid_model.set_node(self.current_wire, self.current_column, qc_grid_node)
+        self.update()
+
+    def place_ctrl_qubit(self, gate_wire, candidate_ctrl_wire):
+        # Attempt to place a control qubit on a wire. If successful, return the wire number. If not, return -1
+        if (candidate_ctrl_wire < 0 or candidate_ctrl_wire >= self.qc_grid_model.num_qubits):
+            return -1
+        
+        candidate_ctrl_wire_gate = self.qc_grid_model.get_gate_at_node(candidate_ctrl_wire, self.current_column)
+
+        if (candidate_ctrl_wire_gate == GATES['EMPTY'] or candidate_ctrl_wire_gate == GATES['TRACE']):
+            qc_grid_node = self.qc_grid_model.get_node(gate_wire, self.current_column)
+            self.qc_grid_model.set_node(gate_wire, self.current_column, qc_grid_node)
+            self.qc_grid_model.set_node(candidate_ctrl_wire, self.current_column, QuantumCircuitGridNode(GATES['EMPTY']))
+            self.update()
+            return candidate_ctrl_wire
+
+    def delete_controls_for_gate(self, gate_wire, column):
+        first_control_wire = self.qc_grid_model(gate_wire, column).first_ctrl
+        second_control_wire = self.qc_grid_model(gate_wire, column).second_ctrl
+
+        # Choose the control wire (if any exist) furthest away from the gate wire
+        first_control_wire_distance = 0
+        second_control_wire_distance = 0
+
+        if first_control_wire >= 0:
+            first_control_wire_distance = abs(first_control_wire - gate_wire)
+
+        if second_control_wire >= 0:
+            second_control_wire_distance = abs(second_control_wire - gate_wire)
+
+        ctrl_wire = -1
+        if first_control_wire_distance > second_control_wire_distance:
+            ctrl_wire = first_control_wire
+        elif first_control_wire_distance < second_control_wire_distance:
+            ctrl_wire = second_control_wire
+        
+        if ctrl_wire >= 0:
+            for wire in range(
+                min(gate_wire, ctrl_wire),
+                max(gate_wire, ctrl_wire) + 1
+            ):
+                print("Replacing wire ", wire, " in column ", column)
+                qc_grid_node = QuantumCircuitGridNode(GATES['EMPTY'])
+                self.qc_grid_model.set_node(wire, column, qc_grid_node)
+
+    def handle_input(self, key):
+        match (key):
+            case pygame.K_a:
+                self.move_to_adjacent_node(QUANTUM_CIRCUIT_MARKER_MOVE_LEFT),
+            case pygame.K_d:
+                self.move_to_adjacent_node(QUANTUM_CIRCUIT_MARKER_MOVE_RIGHT),
+            case pygame.K_w:
+                self.move_to_adjacent_node(QUANTUM_CIRCUIT_MARKER_MOVE_UP),
+            case pygame.K_s:
+                self.move_to_adjacent_node(QUANTUM_CIRCUIT_MARKER_MOVE_DOWN),
+            case pygame.K_x:
+                self.handle_input_x(),
+            case pygame.K_y:
+                self.handle_input_y(),
+            case pygame.K_z:
+                self.handle_input_z(),
+            case pygame.K_h:
+                self.handle_input_h(),
+            case pygame.K_SPACE:
+                self.handle_input_delete(self.current_wire, self.current_column),
+            case pygame.K_c:
+                self.handle_input_ctrl(),
+            case pygame.K_UP:
+                self.handle_input_move_ctrl(QUANTUM_CIRCUIT_MARKER_MOVE_UP),
+            case pygame.K_DOWN:
+                self.handle_input_move_ctrl(QUANTUM_CIRCUIT_MARKER_MOVE_DOWN),
+            case pygame.K_LEFT:
+                self.handle_input_rotate(-np.pi / 8),
+            case pygame.K_RIGHT:
+                self.handle_input_rotate(np.pi / 8)
+
+    ## RUN, DRAW AND UPDATE EVERYTHING
+    def run(self):
+        ## Create QuantumCircuitGridGate Object for each gate in the qc_circuit_grid
+        for wire in range(self.qc_grid_model.num_qubits):
+            for column in range(self.qc_grid_model.num_columns):
+                self.gate_tiles[wire][column] = QuantumCircuitGridGate(self.qc_grid_model, wire, column)
+                self.gate_tiles[wire][column].run()
+        
+        ## Drawing
+        pygame.sprite.RenderPlain.__init__(self, self.qc_grid_background, self.gate_tiles, self.qc_grid_cursor)
+        
+        ## Update
+        self.update()

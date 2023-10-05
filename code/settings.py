@@ -81,6 +81,9 @@ PLAYER_SPEED = 300
 BUTTON_SIZE = 50
 BUTTON_MARGIN = 6
 
+# Overworld
+OVERWORLD_NODE_POSITIONS = [(110,400), (300,220), (480,610), (610,350), (880,210), (1050,400)]
+
 # Saving Levels Settings
 SAVE_FILE_EXTENSION = '.qvania'
 SAVE_FOLDER_NAME = 'saved_levels'

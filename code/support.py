@@ -29,7 +29,7 @@ def import_images_from_folder_as_dict(path):
 
 def import_levels(folder_name):
     saved_levels = {}
-    node_positions = [(110,400), (300,220), (480,610), (610,350), (880,210), (1050,400)]
+    node_positions = OVERWORLD_NODE_POSITIONS
     
     for _folder_name, _sub_folders, file_names in walk(folder_name):
         for index, file_name in enumerate(file_names):
