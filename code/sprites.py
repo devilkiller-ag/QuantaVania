@@ -215,13 +215,15 @@ class Pearl(Generic):
 
 ## Player
 class Player(Generic):
-    def __init__(self, position, assets, group, collision_sprites, jump_sound):
+    def __init__(self, position, assets, group, collision_sprites, jump_sound, health, shield):
         ## Animation
         self.animation_frames = assets
         self.frame_index = 0
         self.status = 'idle'
         self.orientation = 'right'
         surface = self.animation_frames[f'{self.status}_{self.orientation}'][self.frame_index]
+        self.health = health
+        self.shield = shield
 
         super().__init__(position, surface, group)
         self.mask = pygame.mask.from_surface(self.image)
@@ -330,6 +332,10 @@ class Player(Generic):
         if not self.invulnerability_timer.active:
             self.invulnerability_timer.activate()
             self.direction.y -= 1.5
+            if self.shield:
+                self.shield -= 10
+            if not self.shield:
+                self.health -= 10
             # print("Ouch!")
 
     def update(self, dt):

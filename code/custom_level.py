@@ -71,7 +71,7 @@ class CustomLevel:
                 
                 match data:
                     case 0: # player
-                        self.player = Player(pos, asset_dictionary['player'], self.all_sprites, self.collision_sprites, jump_sound)
+                        self.player = Player(pos, asset_dictionary['player'], self.all_sprites, self.collision_sprites, jump_sound, health=100, shield=100)
                     case 1: # sky
                         self.horizon_y = pos[1]
                         self.all_sprites.horizon_y = pos[1]
@@ -173,7 +173,7 @@ class CustomLevel:
             self.player.damage()
 
     def check_death(self):
-        if self.player.position.y > WINDOW_HEIGHT:
+        if self.player.position.y > WINDOW_HEIGHT or self.player.health == 0:
             self.bg_music.stop()
             self.create_overworld(self.current_level, 0)
 			
@@ -212,6 +212,12 @@ class CustomLevel:
         self.level_display_surface.blit(self.hp_icn,(1210,0))
         self.level_display_surface.blit(self.shield_icn,(1210,80))
         self.all_sprites.custom_draw(self.player)
+
+        font = pygame.font.SysFont("Arial", 36)
+        hp_txt = font.render(f"{self.player.health}/100", True, (255,255,255))
+        shield_txt = font.render(f"{self.player.shield}/100", True, (255,255,255))
+        self.level_display_surface.blit(hp_txt,(1210-hp_txt.get_width(),10))
+        self.level_display_surface.blit(shield_txt,(1210-shield_txt.get_width(),90))
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):
