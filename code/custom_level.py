@@ -2,6 +2,7 @@
 import pygame, sys 
 from pygame.math import Vector2 as vector
 from random import choice, randint
+from pygame.image import load as loadImage
 
 from settings import *
 from support import *
@@ -19,7 +20,8 @@ class CustomLevel:
         self.damage_sprites = pygame.sprite.Group() ## Sprites of Enemies which will cause damage to player
         self.collision_sprites = pygame.sprite.Group()
         self.shell_sprites = pygame.sprite.Group()
-        
+        self.bg_lvl1 = loadImage("graphics/background/1.png")
+
         self.build_level(level_grid, asset_dictionary, audio['jump'])
 
         ## Level Limits
@@ -203,6 +205,8 @@ class CustomLevel:
 
         ## draw
         self.level_display_surface.fill(SKY_COLOR)
+        size = pygame.transform.scale(self.bg_lvl1,(1280,720))
+        self.level_display_surface.blit(size,(0,0))
         self.all_sprites.custom_draw(self.player)
 
 class CameraGroup(pygame.sprite.Group):
@@ -241,10 +245,10 @@ class CameraGroup(pygame.sprite.Group):
             if sprite.z_index == LEVEL_LAYERS['clouds']:
                 offset_rect = sprite.rect.copy()
                 offset_rect.center -= self.offset
-                self.display_surface.blit(sprite.image, offset_rect)
+               # self.display_surface.blit(sprite.image, offset_rect)
 
         ## Draw Horizon
-        self.draw_horizon()
+       # self.draw_horizon()
 
         ## Draw everything except clouds
         for sprite in self:

@@ -16,7 +16,7 @@ class Editor:
 	def __init__(self, land_tiles, switch, create_overworld, current_level , new_max_level):
 
 		## main setup 
-		self.editor_display_surface = pygame.display.get_surface()
+		self.editor_display_surface = pygame.display.get_surface() 
 		self.canvas_data = {}
 		self.switch = switch
 		self.create_overworld = create_overworld
@@ -26,6 +26,7 @@ class Editor:
 		## imported graphics
 		self.land_tiles = land_tiles
 		self.import_graphics()
+		self.bg_lvl1 = loadImage("graphics/background/1.png")	# background for lvl 1
 
 		## clouds
 		self.current_clouds = []
@@ -295,7 +296,7 @@ class Editor:
 				if mouse_buttons()[2]: # right mouse click
 					export_layer_data = self.create_grid()
 					###################### INPUT #################
-					self.saveloadmanager.save_data(export_layer_data, "level_4")
+					self.saveloadmanager.save_data(export_layer_data, "level_3")
 					self.create_overworld(self.current_level, self.new_max_level)
 
 			# Switch to Play Mode When user press Play Button (EXPORT MAP AND CREATE ACTUAL LEVEL)
@@ -538,6 +539,10 @@ class Editor:
 		if horizon_y < 0: # else fill the entire screen with water
 			self.editor_display_surface.fill(SEA_COLOR)
 
+	def display_bg(self):
+		size = pygame.transform.scale(self.bg_lvl1,(1280,720))
+		self.editor_display_surface.blit(size,(0,0))
+
 	def create_clouds(self, event):
 		if event.type == self.cloud_timer:
 			## Create New Clouds on the right side of window
@@ -586,6 +591,7 @@ class Editor:
 		## drawing
 		self.editor_display_surface.fill('white')
 		self.display_sky(dt)
+		self.display_bg()
 		self.draw_level()
 		self.draw_grid_lines()
 		# pygame.draw.circle(self.editor_display_surface, 'red', self.origin, 10)

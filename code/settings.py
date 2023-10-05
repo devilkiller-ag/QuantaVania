@@ -63,7 +63,7 @@ LEVEL_LAYERS = {
 }
 
 # colors 
-SKY_COLOR = '#ddc6a1'
+SKY_COLOR = '#27005d'
 SEA_COLOR = '#92a9ce'
 HORIZON_COLOR = '#f5f1de'
 HORIZON_TOP_COLOR = '#d1aa9d'
