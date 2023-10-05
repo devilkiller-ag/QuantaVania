@@ -21,6 +21,8 @@ class CustomLevel:
         self.collision_sprites = pygame.sprite.Group()
         self.shell_sprites = pygame.sprite.Group()
         self.bg_lvl1 = loadImage("graphics/background/1.png")
+        self.hp_icn = loadImage("graphics/buttons/HP.png")
+        self.shield_icn = loadImage("graphics/buttons/Shield.png")
 
         self.build_level(level_grid, asset_dictionary, audio['jump'])
 
@@ -207,6 +209,8 @@ class CustomLevel:
         self.level_display_surface.fill(SKY_COLOR)
         size = pygame.transform.scale(self.bg_lvl1,(1280,720))
         self.level_display_surface.blit(size,(0,0))
+        self.level_display_surface.blit(self.hp_icn,(1210,0))
+        self.level_display_surface.blit(self.shield_icn,(1210,80))
         self.all_sprites.custom_draw(self.player)
 
 class CameraGroup(pygame.sprite.Group):
