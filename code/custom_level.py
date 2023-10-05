@@ -6,6 +6,7 @@ from random import choice, randint
 from settings import *
 from support import *
 from sprites import Generic, CollidableBlock, Cloud, AnimatedSprite, ParticleEffect, Coin, Spikes, CrabMonster, Shell, Player
+from quantum_circuit import QuantumCircuitGrid
 
 class CustomLevel:
     def __init__(self, current_level, new_max_level, level_grid, switch, create_overworld, asset_dictionary, audio):
@@ -50,6 +51,16 @@ class CustomLevel:
         self.create_overworld = create_overworld
         self.current_level = current_level
         self.new_max_level = new_max_level
+
+        ## QuantumCircuitGrid
+        if self.current_level == 0:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 1, 3)
+        elif self.current_level == 1:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 2, 4)
+        elif self.current_level == 2:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 3, 5)
+        else:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 3, 6)
 
     def build_level(self, level_grid, asset_dictionary, jump_sound):
         for layer_name, layer in level_grid.items():
@@ -184,6 +195,9 @@ class CustomLevel:
                 pygame.quit()
                 sys.exit()
             
+            if event.type == pygame.KEYDOWN:
+                self.qc_grid.handle_input(event.key)
+
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.bg_music.stop()
                 # self.switch()
@@ -196,6 +210,7 @@ class CustomLevel:
         ## update
         self.event_loop()
         self.all_sprites.update(dt)
+        self.qc_grid.run()
         self.get_coins()
         self.get_damage()
         self.check_death()
@@ -204,6 +219,7 @@ class CustomLevel:
         ## draw
         self.level_display_surface.fill(SKY_COLOR)
         self.all_sprites.custom_draw(self.player)
+        self.qc_grid.draw(self.level_display_surface)
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):
