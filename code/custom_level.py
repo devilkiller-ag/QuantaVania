@@ -33,6 +33,13 @@ class CustomLevel:
             'right': (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[-1])[0] + 500 if level_grid['terrain'] else 1800 # x of rightmost terrain tile + offset(500)
         }
 
+        # Clouds
+        self.current_clouds = list()
+        self.cloud_surfaces = import_images_from_folder('graphics/clouds')
+        self.cloud_timer = pygame.USEREVENT + 1
+        pygame.time.set_timer(self.cloud_timer, 2000)
+        self.startup_clouds()
+
         ## Additional Stuffs
         self.particles_surfaces = asset_dictionary['particles']
         self.cloud_surfaces = asset_dictionary['clouds']
@@ -147,6 +154,7 @@ class CustomLevel:
         for sprite in self.shell_sprites:
             sprite.player = self.player
 
+    '''
     def create_cloud(self):
         ## Create New Clouds on the right side of window
         cloud_surface = choice(self.cloud_surfaces) # randomly select a cloud from all types of cloud surfaces available
@@ -154,7 +162,7 @@ class CustomLevel:
         x = self.level_limits['right'] + randint(100, 300)
         y = self.horizon_y - randint(-50, 600)
         Cloud((x, y), cloud_surface, self.all_sprites, self.level_limits['left'])
-
+    
     def startup_clouds(self): # To have some clouds initially as we start the editor
         for counter in range(20):
             cloud_surface = choice(self.cloud_surfaces) # randomly select a cloud from all types of cloud surfaces available
@@ -162,6 +170,46 @@ class CustomLevel:
             x = randint(self.level_limits['left'], self.level_limits['right'])
             y = self.horizon_y - randint(-50, 600)
             Cloud((x, y), cloud_surface, self.all_sprites, self.level_limits['left'])
+    '''
+    def create_clouds(self, event):
+    	if event.type == self.cloud_timer:
+			## Create New Clouds on the right side of window
+            cloud_surface = choice(self.cloud_surfaces) # randomly select a cloud from all types of cloud surfaces available
+            #print("alpha:",cloud_surface.get_alpha())
+            cloud_surface.set_alpha(50)
+            cloud_surface = pygame.transform.scale2x(cloud_surface) if randint(0, 4) < 2 else cloud_surface # scale this cloud surfaces by 2x randomly
+			
+            cloud_position = [WINDOW_WIDTH + randint(50, 100), randint(0, WINDOW_HEIGHT)]
+            cloud_speed = randint(20, 50)
+            self.current_clouds.append({
+                'surface': cloud_surface,
+                'position': cloud_position,
+                'speed': cloud_speed
+            })
+
+            ## Delete clouds which passes the left side of window
+            self.current_clouds = [cloud for cloud in self.current_clouds if cloud['position'][0] > -400]
+	
+    def startup_clouds(self): # To have some clouds initially as we start the editor
+        for counter in range(10):
+            cloud_surface = choice(self.cloud_surfaces) # randomly select a cloud from all types of cloud surfaces available
+            cloud_surface = pygame.transform.scale2x(cloud_surface) if randint(0, 4) < 2 else cloud_surface # scale this cloud surfaces by 2x randomly
+            cloud_surface.set_alpha(50)
+            cloud_position = [randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT)]
+            cloud_speed = randint(20, 50)
+            self.current_clouds.append({
+	            'surface': cloud_surface,
+	            'position': cloud_position,
+	            'speed': cloud_speed
+	        })
+
+    def display_clouds(self, dt, horizon_y):
+        for cloud in self.current_clouds: # cloud.keys: {surface, position, speed}
+            # Move the cloud towards left
+            cloud['position'][0] -= cloud['speed'] * dt
+            x = cloud['position'][0]
+            y = horizon_y - cloud['position'][1] #to draw clouds relative to horizon
+            self.level_display_surface.blit(cloud['surface'], (x, y))
 
     def get_coins(self):
         collided_coins = pygame.sprite.spritecollide(self.player, self.coin_sprites, True) # spritecolide(sprite, group, dokill)
@@ -206,9 +254,10 @@ class CustomLevel:
                 self.bg_music.stop()
                 # self.switch()
                 self.create_overworld(2, 3)
-            
+            '''
             if event.type == self.cloud_timer:
-                self.create_cloud()
+                self.create_clouds()
+            '''
     
     def run(self, dt):
         ## update
@@ -226,7 +275,7 @@ class CustomLevel:
         self.level_display_surface.blit(size,(0,0))
         self.level_display_surface.blit(self.hp_icn,(1210,0))
         self.level_display_surface.blit(self.shield_icn,(1210,80))
-        self.create_cloud()
+        self.display_clouds(dt,360)
         self.all_sprites.custom_draw(self.player)
         self.qc_grid.draw(self.level_display_surface)
 
