@@ -195,6 +195,7 @@ class CustomLevel:
         coint_amount_rect = coint_amount_surface.get_rect(midright = (self.qubit_icon_rect.left + 15, self.qubit_icon_rect.centery))
         self.level_display_surface.blit(coint_amount_surface, coint_amount_rect)
 
+
     ### MECHANICS
     def get_coins(self):
         collided_coins = pygame.sprite.spritecollide(self.player, self.coin_sprites, True) # spritecolide(sprite, group, dokill)
@@ -329,3 +330,60 @@ class CameraGroup(pygame.sprite.Group):
                     offset_rect = sprite.rect.copy()
                     offset_rect.center -= self.offset
                     self.display_surface.blit(sprite.image, offset_rect)
+
+class DialogBox(pygame.sprite.Sprite):
+    def __init__(self, width, height, pos_x, pos_y, message, user_input=False, input_x=None, input_y=None):
+        super(DialogBox,self).__init__()
+        self.width = width
+        self.height = height
+        self.pos_x = pos_x      # coordinates for Dialog Box Surface Coordinates
+        self.pos_y = pos_y
+        self.input_x = input_x  # coordinates for User Input Text Surface
+        self.input_y = input_y
+        self.dialog_box = pygame.transform.scale(loadImage("graphics/ui/dialog_box.png"),(self.width, self.height))
+        self.dialog_box_surface = pygame.display.get_surface()
+        self.font = pygame.font.Font("graphics/ui/ARCADEPI.TTF" , 20)
+        self.status = TRUE     # Does the user want the dialog box on?
+        self.user_input = user_input    # IF dialog box takes in text input from user
+        self.message = message # (list) print each item on different lines
+        user_text = '' # input given by user stored here
+
+    def event_loop(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            self.dialog_box(event)
+            if self.user_input:
+                self.box_input(event)
+
+    def show_dialog(self, event):
+        if (event.type==pygame.K_RETURN and user_input == False):   # Checks if Player's Input is done(if any) and doesn't close dialog box immediately
+            self.status = False
+        if self.status:
+            self.dialog_box_surface.blit(self.dialog_box,(pos_x, posy)) # Draws Dialog Box
+            dx = self.pos_x + 5 
+            dy = self.pos_y + 5
+
+            for lines in self.message:
+                line_surface = self.font.render(line, False, DIALOG_TEXT_COLOR) # prints text line by line
+                line_rect = dialog_box_surface.blit(line_surface, (dx, dy))
+                dx += 5 # Line Spacing
+        else:
+            self.dialog_box.kill()
+        pygame.display.update(self.dialog_box_surface.get_rect())
+    
+    def box_input(self, event):
+        input_status = True
+        if (event.type==pygame.K_RETURN):
+            input_status = False
+            user_input = False
+        if input_status:
+            if event.type == pygame.KEYDOWN: 
+                if event.key == pygame.K_BACKSPACE: 
+                    user_text = user_text[:-1] 
+                else: 
+                    user_text += event.unicode
+        text_surface = base_font.render(user_text, False, DIALOG_TEXT_COLOR)
+        screen.blit(text_surface, (self.input_x, self.input_y))
+        pygame.display.update(text_surface.get_rect())
