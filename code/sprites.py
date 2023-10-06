@@ -4,6 +4,7 @@ from pygame.math import Vector2 as vector
 from random import choice, randint
 
 from settings import *
+from support import *
 from timer import Timer
 
 class Generic(pygame.sprite.Sprite):
@@ -351,8 +352,10 @@ class Player(Generic):
                 self.health_damage = 100
             # print("Ouch!")
 
-    def create_qubit_bullet(self):
-        return QubitBullet((100, WINDOW_HEIGHT / 2))
+    def create_qubit_bullet(self, qubit_bullet_state, position, num_qubits = 3):
+        print(position)
+        return QubitBullet(qubit_bullet_state, position, num_qubits)
+        # return QubitBullet(qubit_bullet_state, (100, WINDOW_HEIGHT / 2), num_qubits)
 
     def update(self, dt):
         self.input()
@@ -365,14 +368,16 @@ class Player(Generic):
         self.animate(dt)
 
 class QubitBullet(pygame.sprite.Sprite):
-    def __init__(self, position):
+    def __init__(self, qubit_bullet_state, position, num_qubits = 3):
         super().__init__()
-        self.image = pygame.Surface((50, 10))
-        self.image.fill((250, 0, 0))
+        self.qubit_bullet_state = qubit_bullet_state
+        self.qubit_bullet_graphics = import_images_from_folder_as_dict('graphics/qubit_bullets')
+        self.image = self.qubit_bullet_graphics[f'qb_{num_qubits}_{self.qubit_bullet_state}']
+        # self.image.fill((250, 0, 0))
         self.rect = self.image.get_rect(center = position)
 
-    def import_bullet_graphics(self):
-        pass
-
     def update(self):
-        self.rect.x += 5
+        self.rect.x += 1
+
+        if self.rect.x >= WINDOW_WIDTH + 200:
+            self.kill()

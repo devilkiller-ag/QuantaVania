@@ -4,6 +4,7 @@ from pygame.math import Vector2 as vector
 from random import choice, randint
 from pygame.image import load as loadImage
 from pygame.mouse import get_pressed as mouse_buttons # mouse_buttons() will return  bool (if_left_mouse_button_is_pressed, if_middle_mouse_button_is_pressed, if_right_mouse_button_is_pressed)
+from qiskit import BasicAer, transpile
 
 from settings import *
 from support import *
@@ -244,13 +245,25 @@ class CustomLevel:
                 # self.switch()
                 self.create_overworld(2, 3)
 
-            # Shoot
+            # Shoot Qubit Bullets
             if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[2]):
-                self.qubit_bullet_sprites.add(self.player.create_qubit_bullet())
+                quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
+                qubit_bullet_state = self.run_quantum_circuit(quantum_circuit)
+                num_qubits = self.current_level + 1 if self.current_level < 3 else 3
+                self.qubit_bullet_sprites.add(self.player.create_qubit_bullet(qubit_bullet_state, self.player.position, num_qubits))
+                self.player.qubit_bullets -= 1
             
             if event.type == self.cloud_timer:
                 self.create_cloud()
     
+    def run_quantum_circuit(self, quantum_circuit):
+        simulator = BasicAer.get_backend("statevector_simulator")
+        quantum_circuit.measure_all()
+        transpiled_circuit = transpile(quantum_circuit, simulator)
+        counts = simulator.run(transpiled_circuit, shots=1).result().get_counts()
+        measured_state = int(list(counts.keys())[0], 2)
+        return measured_state
+
     def run(self, dt):
         ## update
         self.event_loop()
@@ -269,13 +282,13 @@ class CustomLevel:
         self.level_display_surface.blit(level_bg,(0,0))
         self.create_cloud()
         self.all_sprites.custom_draw(self.player)
+        # Qubit Bullets
+        self.qubit_bullet_sprites.draw(self.level_display_surface)
         # UI
         self.qc_grid.draw(self.level_display_surface)
         self.show_health(self.player.health_damage, self.player.max_health_damage)
         self.show_shield(self.player.shield_damage, self.player.max_shield_damage)
         self.show_coin(self.player.qubit_bullets)
-        # Qubit Bullets
-        self.qubit_bullet_sprites.draw(self.level_display_surface)
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):
