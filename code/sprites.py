@@ -352,7 +352,7 @@ class Player(Generic):
             # print("Ouch!")
 
     def create_qubit_bullet(self):
-        return QubitBullet(self.rect.center)
+        return QubitBullet((100, WINDOW_HEIGHT / 2))
 
     def update(self, dt):
         self.input()
@@ -366,10 +366,13 @@ class Player(Generic):
 
 class QubitBullet(pygame.sprite.Sprite):
     def __init__(self, position):
-        super(QubitBullet, self).__init__()
+        super().__init__()
         self.image = pygame.Surface((50, 10))
         self.image.fill((250, 0, 0))
         self.rect = self.image.get_rect(center = position)
+
+    def import_bullet_graphics(self):
+        pass
 
     def update(self):
         self.rect.x += 5
