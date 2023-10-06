@@ -371,7 +371,7 @@ class DialogBox(pygame.sprite.Sprite):
             for lines in self.message:
                 line_surface = self.font.render(lines, False, DIALOG_TEXT_COLOR) # prints text line by line
                 line_rect = self.dialog_box_surface.blit(line_surface, (dx, dy))
-                dx += 5 # Line Spacing
+                dy += 20 # Line Spacing
         else:
             self.dialog_box.kill()
         # pygame.display.update(self.dialog_box_surface.get_rect())
@@ -393,4 +393,4 @@ class DialogBox(pygame.sprite.Sprite):
 
     def run(self,dt):
         self.event_loop()
-        self.update(dt)
+        #self.update(dt)
