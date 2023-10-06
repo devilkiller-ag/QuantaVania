@@ -352,10 +352,9 @@ class Player(Generic):
                 self.health_damage = 100
             # print("Ouch!")
 
-    def create_qubit_bullet(self, qubit_bullet_state, position, num_qubits = 3):
-        print(position)
-        return QubitBullet(qubit_bullet_state, position, num_qubits)
-        # return QubitBullet(qubit_bullet_state, (100, WINDOW_HEIGHT / 2), num_qubits)
+    def create_qubit_bullet(self, qubit_bullet_state, num_qubits = 3):
+        bullet_start_position = (WINDOW_WIDTH / 2 + 44, WINDOW_HEIGHT / 2)
+        return QubitBullet(qubit_bullet_state, bullet_start_position, num_qubits)
 
     def update(self, dt):
         self.input()

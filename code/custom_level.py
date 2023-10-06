@@ -250,7 +250,11 @@ class CustomLevel:
                 quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
                 qubit_bullet_state = self.run_quantum_circuit(quantum_circuit)
                 num_qubits = self.current_level + 1 if self.current_level < 3 else 3
-                self.qubit_bullet_sprites.add(self.player.create_qubit_bullet(qubit_bullet_state, self.player.position, num_qubits))
+                terrain_start = {
+                    'x': (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[0])[0],
+                    'y': (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[0])[1]
+                }
+                self.qubit_bullet_sprites.add(self.player.create_qubit_bullet(qubit_bullet_state, num_qubits))
                 self.player.qubit_bullets -= 1
             
             if event.type == self.cloud_timer:
