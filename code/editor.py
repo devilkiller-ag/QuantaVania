@@ -91,8 +91,8 @@ class Editor:
 	def import_graphics(self):
 		self.water_bottom = loadImage('graphics/terrain/water/water_bottom.png').convert_alpha()
 		self.sky_handle = loadImage('graphics/cursors/handle.png').convert_alpha()
-		self.save_button = loadImage('graphics/save_btn.png').convert_alpha()
-		self.play_button = loadImage('graphics/play_btn.png').convert_alpha()
+		self.save_button = loadImage('graphics/ui/save_btn.png').convert_alpha()
+		self.play_button = loadImage('graphics/ui/play_btn.png').convert_alpha()
 		
 		# import animations
 		self.animations = {} # Ex: {3: {'frame index': 0, 'frames': [graphics_surfaces_01, graphics_surface_02], 'length': 2}}
@@ -296,7 +296,7 @@ class Editor:
 				if mouse_buttons()[2]: # right mouse click
 					export_layer_data = self.create_grid()
 					###################### INPUT #################
-					self.saveloadmanager.save_data(export_layer_data, "level_3")
+					self.saveloadmanager.save_data(export_layer_data, "level_6")
 					self.create_overworld(self.current_level, self.new_max_level)
 
 			# Switch to Play Mode When user press Play Button (EXPORT MAP AND CREATE ACTUAL LEVEL)
