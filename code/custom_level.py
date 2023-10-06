@@ -21,6 +21,7 @@ class CustomLevel:
         self.all_sprites = CameraGroup()
         self.coin_sprites = pygame.sprite.Group()
         self.damage_sprites = pygame.sprite.Group() ## Sprites of Enemies which will cause damage to player
+        self.destroyable_enemies_sprites = pygame.sprite.Group() ## Sprites of Enemies which will can be destroyed by player qubit bullet
         self.collision_sprites = pygame.sprite.Group()
         self.shell_sprites = pygame.sprite.Group()
         self.qubit_bullet_sprites = pygame.sprite.Group()
@@ -111,7 +112,7 @@ class CustomLevel:
                     case 7: # Spikes
                         Spikes(asset_dictionary['spikes'], pos, [self.all_sprites, self.damage_sprites])
                     case 8: # CrabMonster
-                        CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.damage_sprites], self.collision_sprites)
+                        CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.damage_sprites, self.destroyable_enemies_sprites], self.collision_sprites)
                     case 9: # Shell pointing left
                         Shell(
                             orientation = 'left', 
@@ -220,6 +221,13 @@ class CustomLevel:
             self.hit_sound.play()
             self.player.damage()
 
+    def destroy_enemy(self):
+        for qubit_bullet in self.qubit_bullet_sprites:
+            for destroyable_enemy in self.destroyable_enemies_sprites:
+                print(qubit_bullet, destroyable_enemy)
+                if qubit_bullet.rect.colliderect(destroyable_enemy.rect):
+                    print("Collision!!")
+
     def check_death(self):
         if self.player.position.y > WINDOW_HEIGHT or self.player.health_damage >= 100:
             self.bg_music.stop()
@@ -275,6 +283,7 @@ class CustomLevel:
         self.qc_grid.run()
         self.get_coins()
         self.get_damage()
+        self.destroy_enemy()
         self.check_death()
         self.check_win()
         self.qubit_bullet_sprites.update()
