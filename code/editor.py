@@ -547,7 +547,10 @@ class Editor:
 		if event.type == self.cloud_timer:
 			## Create New Clouds on the right side of window
 			cloud_surface = choice(self.cloud_surfaces) # randomly select a cloud from all types of cloud surfaces available
+			#print("alpha:",cloud_surface.get_alpha())
+			cloud_surface.set_alpha(50)
 			cloud_surface = pygame.transform.scale2x(cloud_surface) if randint(0, 4) < 2 else cloud_surface # scale this cloud surfaces by 2x randomly
+			
 			cloud_position = [WINDOW_WIDTH + randint(50, 100), randint(0, WINDOW_HEIGHT)]
 			cloud_speed = randint(20, 50)
 			self.current_clouds.append({
@@ -560,9 +563,10 @@ class Editor:
 			self.current_clouds = [cloud for cloud in self.current_clouds if cloud['position'][0] > -400]
 	
 	def startup_clouds(self): # To have some clouds initially as we start the editor
-		for counter in range(20):
+		for counter in range(15):
 			cloud_surface = choice(self.cloud_surfaces) # randomly select a cloud from all types of cloud surfaces available
 			cloud_surface = pygame.transform.scale2x(cloud_surface) if randint(0, 4) < 2 else cloud_surface # scale this cloud surfaces by 2x randomly
+			cloud_surface.set_alpha(50)
 			cloud_position = [randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT)]
 			cloud_speed = randint(20, 50)
 			self.current_clouds.append({
@@ -590,8 +594,9 @@ class Editor:
 
 		## drawing
 		self.editor_display_surface.fill('white')
-		self.display_sky(dt)
 		self.display_bg()
+		self.display_clouds(dt,self.sky_handle.rect.centery)
+
 		self.draw_level()
 		self.draw_grid_lines()
 		# pygame.draw.circle(self.editor_display_surface, 'red', self.origin, 10)

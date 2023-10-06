@@ -226,6 +226,7 @@ class CustomLevel:
         self.level_display_surface.blit(size,(0,0))
         self.level_display_surface.blit(self.hp_icn,(1210,0))
         self.level_display_surface.blit(self.shield_icn,(1210,80))
+        self.create_cloud()
         self.all_sprites.custom_draw(self.player)
         self.qc_grid.draw(self.level_display_surface)
 
