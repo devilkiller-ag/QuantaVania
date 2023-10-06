@@ -22,7 +22,7 @@ class CustomLevel:
         self.damage_sprites = pygame.sprite.Group() ## Sprites of Enemies which will cause damage to player
         self.collision_sprites = pygame.sprite.Group()
         self.shell_sprites = pygame.sprite.Group()
-        self.qubit_bullet_group = pygame.sprite.Group()
+        self.qubit_bullet_sprites = pygame.sprite.Group()
         ## UI
         self.bg_lvl1 = loadImage("graphics/background/1.png")
         self.health_bar = loadImage("graphics/ui/health_bar.png").convert_alpha()
@@ -93,7 +93,7 @@ class CustomLevel:
                 
                 match data:
                     case 0: # player
-                        self.player = Player(pos, asset_dictionary['player'], self.all_sprites, self.collision_sprites, jump_sound, self.qubit_bullet_group)
+                        self.player = Player(pos, asset_dictionary['player'], self.all_sprites, self.collision_sprites, jump_sound, self.qubit_bullet_sprites)
                     case 1: # sky
                         self.horizon_y = pos[1]
                         self.all_sprites.horizon_y = pos[1]
@@ -245,9 +245,10 @@ class CustomLevel:
                 self.create_overworld(2, 3)
 
             # Shoot
-            if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[2]):
-                self.player.health_damage = 60
-                self.qubit_bullet_group.add(self.player.create_qubit_bullet())
+            # if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[0]):
+            if (event.type == pygame.KEYDOWN and event.key == pygame.K_p):
+                print("Clicked")
+                self.qubit_bullet_sprites.add(self.player.create_qubit_bullet())
             
             if event.type == self.cloud_timer:
                 self.create_cloud()
@@ -261,6 +262,7 @@ class CustomLevel:
         self.get_damage()
         self.check_death()
         self.check_win()
+        self.qubit_bullet_sprites.update()
 
         ## draw
         # Background
@@ -275,7 +277,7 @@ class CustomLevel:
         self.show_shield(self.player.shield_damage, self.player.max_shield_damage)
         self.show_coin(self.player.qubit_bullets)
         # Qubit Bullets
-        self.qubit_bullet_group.draw(self.level_display_surface)
+        self.qubit_bullet_sprites.draw(self.level_display_surface)
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):
