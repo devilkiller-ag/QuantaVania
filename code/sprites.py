@@ -4,6 +4,7 @@ from pygame.math import Vector2 as vector
 from random import choice, randint
 
 from settings import *
+from support import *
 from timer import Timer
 
 class Generic(pygame.sprite.Sprite):
@@ -103,6 +104,7 @@ class CrabMonster(Generic):
         self.frame_index += ANIMATION_SPEED * dt
         self.frame_index = 0 if self.frame_index >= len(current_animation) else self.frame_index
         self.image = current_animation[int(self.frame_index)]
+        # self.image.fill("white")
         self.mask = pygame.mask.from_surface(self.image)
     
     def move(self, dt):
@@ -351,8 +353,9 @@ class Player(Generic):
                 self.health_damage = 100
             # print("Ouch!")
 
-    def create_qubit_bullet(self):
-        return QubitBullet(self.rect.center)
+    def create_qubit_bullet(self, qubit_bullet_state, num_qubits = 3):
+        bullet_start_position = (WINDOW_WIDTH / 2 + 44, WINDOW_HEIGHT / 2)
+        return QubitBullet(qubit_bullet_state, bullet_start_position, num_qubits)
 
     def update(self, dt):
         self.input()
@@ -365,11 +368,16 @@ class Player(Generic):
         self.animate(dt)
 
 class QubitBullet(pygame.sprite.Sprite):
-    def __init__(self, position):
-        super(QubitBullet, self).__init__()
-        self.image = pygame.Surface((50, 10))
-        self.image.fill((250, 0, 0))
+    def __init__(self, qubit_bullet_state, position, num_qubits = 3):
+        super().__init__()
+        self.qubit_bullet_state = qubit_bullet_state
+        self.qubit_bullet_graphics = import_images_from_folder_as_dict('graphics/qubit_bullets')
+        self.image = self.qubit_bullet_graphics[f'qb_{num_qubits}_{self.qubit_bullet_state}']
+        # self.image.fill((250, 0, 0))
         self.rect = self.image.get_rect(center = position)
 
     def update(self):
-        self.rect.x += 5
+        self.rect.x += 1
+
+        if self.rect.x >= WINDOW_WIDTH + 200:
+            self.kill()
