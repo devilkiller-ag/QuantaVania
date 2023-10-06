@@ -3,6 +3,8 @@ import pygame, sys
 from pygame.math import Vector2 as vector
 from random import choice, randint
 from pygame.image import load as loadImage
+from pygame.mouse import get_pressed as mouse_buttons # mouse_buttons() will return  bool (if_left_mouse_button_is_pressed, if_middle_mouse_button_is_pressed, if_right_mouse_button_is_pressed)
+from qiskit import BasicAer, transpile
 
 from settings import *
 from support import *
@@ -15,12 +17,14 @@ class CustomLevel:
         self.switch = switch
         self.level_grid = level_grid
 
-        ## Objects/Sprites: Player, Trees
+        ## Objects/Sprites: Player, Trees, Qubit Bullets
         self.all_sprites = CameraGroup()
         self.coin_sprites = pygame.sprite.Group()
         self.damage_sprites = pygame.sprite.Group() ## Sprites of Enemies which will cause damage to player
+        self.destroyable_enemies_sprites = pygame.sprite.Group() ## Sprites of Enemies which will can be destroyed by player qubit bullet
         self.collision_sprites = pygame.sprite.Group()
         self.shell_sprites = pygame.sprite.Group()
+        self.qubit_bullet_sprites = pygame.sprite.Group()
         ## UI
         self.bg_lvl1 = loadImage("graphics/background/1.png")
         self.health_bar = loadImage("graphics/ui/health_bar.png").convert_alpha()
@@ -91,7 +95,7 @@ class CustomLevel:
                 
                 match data:
                     case 0: # player
-                        self.player = Player(pos, asset_dictionary['player'], self.all_sprites, self.collision_sprites, jump_sound)
+                        self.player = Player(pos, asset_dictionary['player'], self.all_sprites, self.collision_sprites, jump_sound, self.qubit_bullet_sprites)
                     case 1: # sky
                         self.horizon_y = pos[1]
                         self.all_sprites.horizon_y = pos[1]
@@ -108,7 +112,7 @@ class CustomLevel:
                     case 7: # Spikes
                         Spikes(asset_dictionary['spikes'], pos, [self.all_sprites, self.damage_sprites])
                     case 8: # CrabMonster
-                        CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.damage_sprites], self.collision_sprites)
+                        CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.damage_sprites, self.destroyable_enemies_sprites], self.collision_sprites)
                     case 9: # Shell pointing left
                         Shell(
                             orientation = 'left', 
@@ -217,6 +221,13 @@ class CustomLevel:
             self.hit_sound.play()
             self.player.damage()
 
+    def destroy_enemy(self):
+        for qubit_bullet in self.qubit_bullet_sprites:
+            for destroyable_enemy in self.destroyable_enemies_sprites:
+                print(qubit_bullet, destroyable_enemy)
+                if qubit_bullet.rect.colliderect(destroyable_enemy.rect):
+                    print("Collision!!")
+
     def check_death(self):
         if self.player.position.y > WINDOW_HEIGHT or self.player.health_damage >= 100:
             self.bg_music.stop()
@@ -236,14 +247,35 @@ class CustomLevel:
             if event.type == pygame.KEYDOWN:
                 self.qc_grid.handle_input(event.key)
 
+
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.bg_music.stop()
                 # self.switch()
                 self.create_overworld(2, 3)
+
+            # Shoot Qubit Bullets
+            if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[2]):
+                quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
+                qubit_bullet_state = self.run_quantum_circuit(quantum_circuit)
+                num_qubits = self.current_level + 1 if self.current_level < 3 else 3
+                terrain_start = {
+                    'x': (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[0])[0],
+                    'y': (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[0])[1]
+                }
+                self.qubit_bullet_sprites.add(self.player.create_qubit_bullet(qubit_bullet_state, num_qubits))
+                self.player.qubit_bullets -= 1
             
             if event.type == self.cloud_timer:
                 self.create_cloud()
     
+    def run_quantum_circuit(self, quantum_circuit):
+        simulator = BasicAer.get_backend("statevector_simulator")
+        quantum_circuit.measure_all()
+        transpiled_circuit = transpile(quantum_circuit, simulator)
+        counts = simulator.run(transpiled_circuit, shots=1).result().get_counts()
+        measured_state = int(list(counts.keys())[0], 2)
+        return measured_state
+
     def run(self, dt):
         ## update
         self.event_loop()
@@ -251,8 +283,10 @@ class CustomLevel:
         self.qc_grid.run()
         self.get_coins()
         self.get_damage()
+        self.destroy_enemy()
         self.check_death()
         self.check_win()
+        self.qubit_bullet_sprites.update()
 
         ## draw
         # Background
@@ -261,6 +295,8 @@ class CustomLevel:
         self.level_display_surface.blit(level_bg,(0,0))
         self.create_cloud()
         self.all_sprites.custom_draw(self.player)
+        # Qubit Bullets
+        self.qubit_bullet_sprites.draw(self.level_display_surface)
         # UI
         self.qc_grid.draw(self.level_display_surface)
         self.show_health(self.player.health_damage, self.player.max_health_damage)

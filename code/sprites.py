@@ -4,6 +4,7 @@ from pygame.math import Vector2 as vector
 from random import choice, randint
 
 from settings import *
+from support import *
 from timer import Timer
 
 class Generic(pygame.sprite.Sprite):
@@ -103,6 +104,7 @@ class CrabMonster(Generic):
         self.frame_index += ANIMATION_SPEED * dt
         self.frame_index = 0 if self.frame_index >= len(current_animation) else self.frame_index
         self.image = current_animation[int(self.frame_index)]
+        # self.image.fill("white")
         self.mask = pygame.mask.from_surface(self.image)
     
     def move(self, dt):
@@ -215,19 +217,24 @@ class Pearl(Generic):
 
 ## Player
 class Player(Generic):
-    def __init__(self, position, assets, group, collision_sprites, jump_sound, qubit_bullet=30):
+    def __init__(self, position, assets, group, collision_sprites, jump_sound, qubit_bullet_group, qubit_bullet=30):
         ## Animation
         self.animation_frames = assets
         self.frame_index = 0
         self.status = 'idle'
         self.orientation = 'right'
         surface = self.animation_frames[f'{self.status}_{self.orientation}'][self.frame_index]
+        
+        ## Stats
         self.max_health_damage = 100
         initial_health = initial_shield = 99
         self.health_damage = self.max_health_damage - initial_health
         self.max_shield_damage = 100 
         self.shield_damage = self.max_shield_damage - initial_shield
+        
+        ## Qubit Bullets
         self.qubit_bullets = qubit_bullet
+        self.qubit_bullet_group = qubit_bullet_group
 
         super().__init__(position, surface, group)
         self.mask = pygame.mask.from_surface(self.image)
@@ -285,6 +292,7 @@ class Player(Generic):
         else:
             self.direction.x = 0
 
+        ## Jump
         if keys[pygame.K_SPACE] and self.on_floor:
             self.jump_sound.play()
             self.direction.y = -2
@@ -345,6 +353,10 @@ class Player(Generic):
                 self.health_damage = 100
             # print("Ouch!")
 
+    def create_qubit_bullet(self, qubit_bullet_state, num_qubits = 3):
+        bullet_start_position = (WINDOW_WIDTH / 2 + 44, WINDOW_HEIGHT / 2)
+        return QubitBullet(qubit_bullet_state, bullet_start_position, num_qubits)
+
     def update(self, dt):
         self.input()
         self.apply_gravity(dt)
@@ -354,3 +366,18 @@ class Player(Generic):
 
         self.get_status()
         self.animate(dt)
+
+class QubitBullet(pygame.sprite.Sprite):
+    def __init__(self, qubit_bullet_state, position, num_qubits = 3):
+        super().__init__()
+        self.qubit_bullet_state = qubit_bullet_state
+        self.qubit_bullet_graphics = import_images_from_folder_as_dict('graphics/qubit_bullets')
+        self.image = self.qubit_bullet_graphics[f'qb_{num_qubits}_{self.qubit_bullet_state}']
+        # self.image.fill((250, 0, 0))
+        self.rect = self.image.get_rect(center = position)
+
+    def update(self):
+        self.rect.x += 1
+
+        if self.rect.x >= WINDOW_WIDTH + 200:
+            self.kill()
