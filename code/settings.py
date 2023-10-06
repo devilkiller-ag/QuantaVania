@@ -20,8 +20,8 @@ EDITOR_DATA = {
 
 	7:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/spikes.png',      'preview': 'graphics/preview/spikes.png',      'graphics': 'graphics/enemies/spikes'},
 	8:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/crab_monster.png',       'preview': 'graphics/preview/crab_monster.png',       'graphics': 'graphics/enemies/crab_monster/idle'},
-	9:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shell_left.png',  'preview': 'graphics/preview/shell_left.png',  'graphics': 'graphics/enemies/shell_left/idle'},
-	10: {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shell_right.png', 'preview': 'graphics/preview/shell_right.png', 'graphics': 'graphics/enemies/shell_right/idle'},
+	9:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shoot_monster_left.png',  'preview': 'graphics/preview/shoot_monster_left.png',  'graphics': 'graphics/enemies/shoot_monster_left/idle'},
+	10: {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shoot_monster_right.png', 'preview': 'graphics/preview/shoot_monster_right.png', 'graphics': 'graphics/enemies/shoot_monster_right/idle'},
 	
 	11: {'style': 'palm_fg', 'type': 'object', 'menu_type': 'palm fg', 'menu_surf': 'graphics/menu/small_fg.png', 'preview': 'graphics/preview/small_fg.png', 'graphics': 'graphics/terrain/palm/small_fg'},
 	12: {'style': 'palm_fg', 'type': 'object', 'menu_type': 'palm fg', 'menu_surf': 'graphics/menu/large_fg.png', 'preview': 'graphics/preview/large_fg.png', 'graphics': 'graphics/terrain/palm/large_fg'},

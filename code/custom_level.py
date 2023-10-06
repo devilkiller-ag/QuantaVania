@@ -8,7 +8,7 @@ from qiskit import BasicAer, transpile
 
 from settings import *
 from support import *
-from sprites import Generic, CollidableBlock, Cloud, AnimatedSprite, ParticleEffect, Coin, Spikes, CrabMonster, Shell, Player
+from sprites import Generic, CollidableBlock, Cloud, AnimatedSprite, ParticleEffect, Coin, Spikes, CrabMonster, ShootMonster, Player
 from quantum_circuit import QuantumCircuitGrid
 
 class CustomLevel:
@@ -23,7 +23,7 @@ class CustomLevel:
         self.damage_sprites = pygame.sprite.Group() ## Sprites of Enemies which will cause damage to player
         self.destroyable_enemies_sprites = pygame.sprite.Group() ## Sprites of Enemies which will can be destroyed by player qubit bullet
         self.collision_sprites = pygame.sprite.Group()
-        self.shell_sprites = pygame.sprite.Group()
+        self.shoot_monster_sprites = pygame.sprite.Group()
         self.qubit_bullet_sprites = pygame.sprite.Group()
         ## UI
         self.bg_lvl1 = loadImage("graphics/background/1.png")
@@ -113,21 +113,21 @@ class CustomLevel:
                         Spikes(asset_dictionary['spikes'], pos, [self.all_sprites, self.damage_sprites])
                     case 8: # CrabMonster
                         CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.damage_sprites, self.destroyable_enemies_sprites], self.collision_sprites)
-                    case 9: # Shell pointing left
-                        Shell(
+                    case 9: # ShootMonster pointing left
+                        ShootMonster(
                             orientation = 'left', 
-                            assets = asset_dictionary['shell'], 
+                            assets = asset_dictionary['shoot_monster'], 
                             position = pos, 
-                            group = [self.all_sprites, self.collision_sprites, self.shell_sprites], 
+                            group = [self.all_sprites, self.collision_sprites, self.shoot_monster_sprites], 
                             pearl_surface = asset_dictionary['pearl'],
                             damage_sprites = self.damage_sprites
                         )
-                    case 10: # Shell pointing right
-                        Shell(
+                    case 10: # ShootMonster pointing right
+                        ShootMonster(
                             orientation = 'right', 
-                            assets = asset_dictionary['shell'], 
+                            assets = asset_dictionary['shoot_monster'], 
                             position = pos, 
-                            group = [self.all_sprites, self.collision_sprites, self.shell_sprites], 
+                            group = [self.all_sprites, self.collision_sprites, self.shoot_monster_sprites], 
                             pearl_surface = asset_dictionary['pearl'],
                             damage_sprites = self.damage_sprites
                         )
@@ -157,7 +157,7 @@ class CustomLevel:
                     case 18: # right palm bg
                         AnimatedSprite(asset_dictionary['palms']['right_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
             
-        for sprite in self.shell_sprites:
+        for sprite in self.shoot_monster_sprites:
             sprite.player = self.player
 
     def create_cloud(self):

@@ -14,7 +14,7 @@ class Generic(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = position)
         self.z_index = z_index
 
-## Smple Invisible Collidible Block to be place over shells, foreground tree tops (putting over tree tops so that user can only collide with Tree top and not to the tree trunk)
+## Smple Invisible Collidible Block to be place over shoot_monsters, foreground tree tops (putting over tree tops so that user can only collide with Tree top and not to the tree trunk)
 class CollidableBlock(Generic):
     def __init__(self, position, size, group):
         surface = pygame.Surface(size)
@@ -140,11 +140,11 @@ class CrabMonster(Generic):
         self.animate(dt)
         self.move(dt)
 
-class Shell(Generic):
+class ShootMonster(Generic):
     def __init__(self, orientation, assets, position, group, pearl_surface, damage_sprites):
         self.orientation = orientation
 
-        self.animation_frames = assets.copy() # Making a copy because we will just flip the graphics of shell_left to get the graphics of shell_right (Making a copy will ensure it's not fliping the original imported assets)
+        self.animation_frames = assets.copy() # Making a copy because we will just flip the graphics of shoot_monster_left to get the graphics of shoot_monster_right (Making a copy will ensure it's not fliping the original imported assets)
         if(orientation == 'right'):
             for key, value in self.animation_frames.items():
                 self.animation_frames[key] = [pygame.transform.flip(surface, True, False) for surface in value]
@@ -162,7 +162,7 @@ class Shell(Generic):
         self.damage_sprites = damage_sprites
     
     def get_status(self):
-        #if player is close enough (when distance btw shell and player is < 500px)
+        #if player is close enough (when distance btw shoot_monster and player is < 500px)
         if vector(self.player.rect.center).distance_to(vector(self.rect.center)) < 500 and not self.attack_cooldown.active:
             self.status = 'attack'
         else:
@@ -178,11 +178,11 @@ class Shell(Generic):
                 self.has_shot = False
         self.image = current_animation[int(self.frame_index)]
 
-        if int(self.frame_index) == 2 and self.status == 'attack' and not self.has_shot: ## Only shoot pearl when shell is at frame 3 (showing shooting mouth)
+        if int(self.frame_index) == 2 and self.status == 'attack' and not self.has_shot: ## Only shoot pearl when shoot_monster is at frame 3 (showing shooting mouth)
             pearl_direction = vector(-1, 0) if self.orientation == 'left' else vector(1, 0)
             # create a pearl 
-            offset = (pearl_direction * 50) if self.orientation == 'left' else (pearl_direction * 20) ## To place pearl exactly inside the shell mouth(Hit & Trail Value)
-            offset += vector(0, -10) # Vertically center the pearl to the level of shell mouth
+            offset = (pearl_direction * 50) if self.orientation == 'left' else (pearl_direction * 20) ## To place pearl exactly inside the shoot_monster mouth(Hit & Trail Value)
+            offset += vector(0, -10) # Vertically center the pearl to the level of shoot_monster mouth
             Pearl(self.rect.center + offset, pearl_direction, self.pearl_surface, [self.groups()[0], self.damage_sprites]) # self.groups()[0]: all_sprites group
             self.has_shot = True
 
