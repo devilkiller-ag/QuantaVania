@@ -16,7 +16,7 @@ class Editor:
 	def __init__(self, land_tiles, switch, create_overworld, current_level , new_max_level):
 
 		## main setup 
-		self.editor_display_surface = pygame.display.get_surface()
+		self.editor_display_surface = pygame.display.get_surface() 
 		self.canvas_data = {}
 		self.switch = switch
 		self.create_overworld = create_overworld
@@ -26,6 +26,7 @@ class Editor:
 		## imported graphics
 		self.land_tiles = land_tiles
 		self.import_graphics()
+		self.bg_lvl1 = loadImage("graphics/background/1.png")	# background for lvl 1
 
 		## clouds
 		self.current_clouds = []
@@ -90,8 +91,8 @@ class Editor:
 	def import_graphics(self):
 		self.water_bottom = loadImage('graphics/terrain/water/water_bottom.png').convert_alpha()
 		self.sky_handle = loadImage('graphics/cursors/handle.png').convert_alpha()
-		self.save_button = loadImage('graphics/save_btn.png').convert_alpha()
-		self.play_button = loadImage('graphics/play_btn.png').convert_alpha()
+		self.save_button = loadImage('graphics/ui/save_btn.png').convert_alpha()
+		self.play_button = loadImage('graphics/ui/play_btn.png').convert_alpha()
 		
 		# import animations
 		self.animations = {} # Ex: {3: {'frame index': 0, 'frames': [graphics_surfaces_01, graphics_surface_02], 'length': 2}}
@@ -295,7 +296,7 @@ class Editor:
 				if mouse_buttons()[2]: # right mouse click
 					export_layer_data = self.create_grid()
 					###################### INPUT #################
-					self.saveloadmanager.save_data(export_layer_data, "level_4")
+					self.saveloadmanager.save_data(export_layer_data, "level_6")
 					self.create_overworld(self.current_level, self.new_max_level)
 
 			# Switch to Play Mode When user press Play Button (EXPORT MAP AND CREATE ACTUAL LEVEL)
@@ -538,11 +539,18 @@ class Editor:
 		if horizon_y < 0: # else fill the entire screen with water
 			self.editor_display_surface.fill(SEA_COLOR)
 
+	def display_bg(self):
+		size = pygame.transform.scale(self.bg_lvl1,(1280,720))
+		self.editor_display_surface.blit(size,(0,0))
+
 	def create_clouds(self, event):
 		if event.type == self.cloud_timer:
 			## Create New Clouds on the right side of window
 			cloud_surface = choice(self.cloud_surfaces) # randomly select a cloud from all types of cloud surfaces available
+			#print("alpha:",cloud_surface.get_alpha())
+			cloud_surface.set_alpha(50)
 			cloud_surface = pygame.transform.scale2x(cloud_surface) if randint(0, 4) < 2 else cloud_surface # scale this cloud surfaces by 2x randomly
+			
 			cloud_position = [WINDOW_WIDTH + randint(50, 100), randint(0, WINDOW_HEIGHT)]
 			cloud_speed = randint(20, 50)
 			self.current_clouds.append({
@@ -555,9 +563,10 @@ class Editor:
 			self.current_clouds = [cloud for cloud in self.current_clouds if cloud['position'][0] > -400]
 	
 	def startup_clouds(self): # To have some clouds initially as we start the editor
-		for counter in range(20):
+		for counter in range(15):
 			cloud_surface = choice(self.cloud_surfaces) # randomly select a cloud from all types of cloud surfaces available
 			cloud_surface = pygame.transform.scale2x(cloud_surface) if randint(0, 4) < 2 else cloud_surface # scale this cloud surfaces by 2x randomly
+			cloud_surface.set_alpha(50)
 			cloud_position = [randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT)]
 			cloud_speed = randint(20, 50)
 			self.current_clouds.append({
@@ -585,7 +594,9 @@ class Editor:
 
 		## drawing
 		self.editor_display_surface.fill('white')
-		self.display_sky(dt)
+		self.display_bg()
+		self.display_clouds(dt,self.sky_handle.rect.centery)
+
 		self.draw_level()
 		self.draw_grid_lines()
 		# pygame.draw.circle(self.editor_display_surface, 'red', self.origin, 10)
