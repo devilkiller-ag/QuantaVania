@@ -91,8 +91,8 @@ class Editor:
 	def import_graphics(self):
 		self.water_bottom = loadImage('graphics/terrain/water/water_bottom.png').convert_alpha()
 		self.sky_handle = loadImage('graphics/cursors/handle.png').convert_alpha()
-		self.save_button = loadImage('graphics/save_btn.png').convert_alpha()
-		self.play_button = loadImage('graphics/play_btn.png').convert_alpha()
+		self.save_button = loadImage('graphics/ui/save_btn.png').convert_alpha()
+		self.play_button = loadImage('graphics/ui/play_btn.png').convert_alpha()
 		
 		# import animations
 		self.animations = {} # Ex: {3: {'frame index': 0, 'frames': [graphics_surfaces_01, graphics_surface_02], 'length': 2}}
