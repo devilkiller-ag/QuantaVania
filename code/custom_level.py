@@ -21,9 +21,17 @@ class CustomLevel:
         self.damage_sprites = pygame.sprite.Group() ## Sprites of Enemies which will cause damage to player
         self.collision_sprites = pygame.sprite.Group()
         self.shell_sprites = pygame.sprite.Group()
+        ## UI
         self.bg_lvl1 = loadImage("graphics/background/1.png")
-        self.hp_icn = loadImage("graphics/buttons/HP.png")
-        self.shield_icn = loadImage("graphics/buttons/Shield.png")
+        self.health_bar = loadImage("graphics/ui/health_bar.png").convert_alpha()
+        self.shield_bar = loadImage("graphics/ui/shield_bar.png").convert_alpha()
+        self.qubit_icon = loadImage("graphics/ui/qubit.png").convert_alpha()
+        self.qubit_icon_rect = self.qubit_icon.get_rect(topleft = (1190, 80))
+        self.font = pygame.font.Font("graphics/ui/ARCADEPI.TTF" , 20)
+        self.bar_max_width = 152
+        self.health_bar_topleft = (1230 - self.bar_max_width, 29)
+        self.shield_bar_topleft = (1230 - self.bar_max_width, 69)
+        self.bar_height = 4
 
         self.build_level(level_grid, asset_dictionary, audio['jump'])
 
@@ -66,6 +74,7 @@ class CustomLevel:
         else:
             self.qc_grid = QuantumCircuitGrid((30, 30), 3, 6)
 
+    ### DRAW LEVEL
     def build_level(self, level_grid, asset_dictionary, jump_sound):
         for layer_name, layer in level_grid.items():
             for pos, data in layer.items():
@@ -82,7 +91,7 @@ class CustomLevel:
                 
                 match data:
                     case 0: # player
-                        self.player = Player(pos, asset_dictionary['player'], self.all_sprites, self.collision_sprites, jump_sound, health=100, shield=100)
+                        self.player = Player(pos, asset_dictionary['player'], self.all_sprites, self.collision_sprites, jump_sound)
                     case 1: # sky
                         self.horizon_y = pos[1]
                         self.all_sprites.horizon_y = pos[1]
@@ -163,6 +172,28 @@ class CustomLevel:
             y = self.horizon_y - randint(-50, 600)
             Cloud((x, y), cloud_surface, self.all_sprites, self.level_limits['left'])
 
+    ## UI
+    def show_health(self, current, full):
+        self.level_display_surface.blit(self.health_bar, (1070, 0))
+        current_health_ratio = current / full
+        current_bar_width = self.bar_max_width * current_health_ratio
+        health_bar_rect = pygame.Rect(self.health_bar_topleft, (current_bar_width, self.bar_height))
+        pygame.draw.rect(self.level_display_surface, HEALTH_BAR_COLOR, health_bar_rect)
+
+    def show_shield(self, current, full):
+        self.level_display_surface.blit(self.shield_bar, (1070, 40))
+        current_shield_ratio = current / full
+        current_bar_width = self.bar_max_width * current_shield_ratio
+        health_bar_rect = pygame.Rect(self.shield_bar_topleft, (current_bar_width, self.bar_height))
+        pygame.draw.rect(self.level_display_surface, SHIELD_BAR_COLOR, health_bar_rect)
+
+    def show_coin(self, amount):
+        self.level_display_surface.blit(self.qubit_icon, self.qubit_icon_rect)
+        coint_amount_surface = self.font.render(str(amount), False, STATS_TEXT_COLOR)
+        coint_amount_rect = coint_amount_surface.get_rect(midright = (self.qubit_icon_rect.left + 15, self.qubit_icon_rect.centery))
+        self.level_display_surface.blit(coint_amount_surface, coint_amount_rect)
+
+    ### MECHANICS
     def get_coins(self):
         collided_coins = pygame.sprite.spritecollide(self.player, self.coin_sprites, True) # spritecolide(sprite, group, dokill)
         for sprite in collided_coins:
@@ -171,11 +202,14 @@ class CustomLevel:
 
             ## Increase Player Score (Or do diffrent things) according to the type of coin/qubit player collided with
             if sprite.coin_type == 'gold':
-                print('gold')
+                self.player.qubit_bullets += 5
+                # print('gold')
             if sprite.coin_type == 'silver':
-                print('silver')
+                self.player.qubit_bullets += 2
+                # print('silver')
             if sprite.coin_type == 'diamond':
-                print('diamond')
+                self.player.qubit_bullets += 10
+                # print('diamond')
 
     def get_damage(self):
         collision_sprites = pygame.sprite.spritecollide(self.player, self.damage_sprites, False, pygame.sprite.collide_mask)
@@ -184,7 +218,7 @@ class CustomLevel:
             self.player.damage()
 
     def check_death(self):
-        if self.player.position.y > WINDOW_HEIGHT or self.player.health == 0:
+        if self.player.position.y > WINDOW_HEIGHT or self.player.health_damage >= 100:
             self.bg_music.stop()
             self.create_overworld(self.current_level, 0)
 			
@@ -221,20 +255,17 @@ class CustomLevel:
         self.check_win()
 
         ## draw
+        # Background
         self.level_display_surface.fill(SKY_COLOR)
-        size = pygame.transform.scale(self.bg_lvl1,(1280,720))
-        self.level_display_surface.blit(size,(0,0))
-        self.level_display_surface.blit(self.hp_icn,(1210,0))
-        self.level_display_surface.blit(self.shield_icn,(1210,80))
+        level_bg = pygame.transform.scale(self.bg_lvl1,(1280,720))
+        self.level_display_surface.blit(level_bg,(0,0))
         self.create_cloud()
         self.all_sprites.custom_draw(self.player)
+        # UI
         self.qc_grid.draw(self.level_display_surface)
-
-        font = pygame.font.SysFont("Arial", 36)
-        hp_txt = font.render(f"{self.player.health}/100", True, (255,255,255))
-        shield_txt = font.render(f"{self.player.shield}/100", True, (255,255,255))
-        self.level_display_surface.blit(hp_txt,(1210-hp_txt.get_width(),10))
-        self.level_display_surface.blit(shield_txt,(1210-shield_txt.get_width(),90))
+        self.show_health(self.player.health_damage, self.player.max_health_damage)
+        self.show_shield(self.player.shield_damage, self.player.max_shield_damage)
+        self.show_coin(self.player.qubit_bullets)
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):
@@ -272,10 +303,10 @@ class CameraGroup(pygame.sprite.Group):
             if sprite.z_index == LEVEL_LAYERS['clouds']:
                 offset_rect = sprite.rect.copy()
                 offset_rect.center -= self.offset
-               # self.display_surface.blit(sprite.image, offset_rect)
+                # self.display_surface.blit(sprite.image, offset_rect)
 
         ## Draw Horizon
-       # self.draw_horizon()
+        # self.draw_horizon()
 
         ## Draw everything except clouds
         for sprite in self:

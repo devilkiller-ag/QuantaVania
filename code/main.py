@@ -20,7 +20,7 @@ class Main:
 
 		## Game Atributes
 		self.max_level = 1
-		self.status = 'editor'
+		self.status = 'overworld'
 
 		## Editor & Levels
 		self.editor_active = True
