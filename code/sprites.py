@@ -364,11 +364,12 @@ class Player(Generic):
         self.get_status()
         self.animate(dt)
 
-class QubitBullet:
+class QubitBullet(pygame.sprite.Sprite):
     def __init__(self, position):
+        super(QubitBullet, self).__init__()
         self.image = pygame.Surface((50, 10))
         self.image.fill((250, 0, 0))
         self.rect = self.image.get_rect(center = position)
-    
+
     def update(self):
         self.rect.x += 5
