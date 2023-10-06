@@ -104,7 +104,7 @@ class CrabMonster(Generic):
         self.frame_index += ANIMATION_SPEED * dt
         self.frame_index = 0 if self.frame_index >= len(current_animation) else self.frame_index
         self.image = current_animation[int(self.frame_index)]
-        # self.image.fill("white")
+        self.image.fill("white")
         self.mask = pygame.mask.from_surface(self.image)
     
     def move(self, dt):
