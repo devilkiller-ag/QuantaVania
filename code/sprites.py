@@ -377,7 +377,7 @@ class Player(Generic):
     def create_qubit_bullet(self, qubit_bullet_state, num_qubits = 3):
         bullet_start_position = (WINDOW_WIDTH / 2 + 44, WINDOW_HEIGHT / 2)
         bullet_direction = 1 if self.orientation == 'right' else -1
-        return QubitBullet(qubit_bullet_state, bullet_start_position, bullet_direction, num_qubits)
+        return QubitBullet(qubit_bullet_state, self.qubit_bullet_group, bullet_start_position, bullet_direction, num_qubits)
 
     def update(self, dt):
         self.input()
@@ -389,9 +389,8 @@ class Player(Generic):
         self.get_status()
         self.animate(dt)
 
-class QubitBullet(pygame.sprite.Sprite):
-    def __init__(self, qubit_bullet_state, position, direction = 1, num_qubits = 3):
-        super().__init__()
+class QubitBullet(Generic):
+    def __init__(self, qubit_bullet_state, group, position, direction = 1, num_qubits = 3):
         self.qubit_bullet_state = qubit_bullet_state
         self.direction = direction
 
@@ -403,6 +402,7 @@ class QubitBullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = position)
 
         self.mask = pygame.mask.from_surface(self.image)
+        super().__init__(position, self.image, group)
 
     def update(self):
         self.rect.x += 1 * self.direction
