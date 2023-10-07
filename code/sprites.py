@@ -2,6 +2,7 @@
 import pygame, sys 
 from pygame.math import Vector2 as vector
 from random import choice, randint
+from math import pow
 
 from settings import *
 from support import *
@@ -141,8 +142,9 @@ class CrabMonster(Generic):
         self.move(dt)
 
 class ShootMonster(Generic):
-    def __init__(self, orientation, assets, position, group, pearl_surface, damage_sprites):
+    def __init__(self, orientation, assets, position, group, damage_sprites, num_qubits=3):
         self.orientation = orientation
+        self.num_qubits = num_qubits
 
         self.animation_frames = assets.copy() # Making a copy because we will just flip the graphics of shoot_monster_left to get the graphics of shoot_monster_right (Making a copy will ensure it's not fliping the original imported assets)
         if(orientation == 'right'):
@@ -155,15 +157,15 @@ class ShootMonster(Generic):
         super().__init__(position, surface, group)
         self.rect.bottom = self.rect.top + TILE_SIZE
 
-        ## Pearls
-        self.pearl_surface = pearl_surface
+        ## ShootMonsterBullets
         self.has_shot = False
         self.attack_cooldown = Timer(2000)
         self.damage_sprites = damage_sprites
     
     def get_status(self):
         #if player is close enough (when distance btw shoot_monster and player is < 500px)
-        if vector(self.player.rect.center).distance_to(vector(self.rect.center)) < 500 and not self.attack_cooldown.active:
+        distance = vector(self.player.rect.center).distance_to(vector(self.rect.center))
+        if distance < 500 and not self.attack_cooldown.active:
             self.status = 'attack'
         else:
             self.status = 'idle'
@@ -178,12 +180,12 @@ class ShootMonster(Generic):
                 self.has_shot = False
         self.image = current_animation[int(self.frame_index)]
 
-        if int(self.frame_index) == 2 and self.status == 'attack' and not self.has_shot: ## Only shoot pearl when shoot_monster is at frame 3 (showing shooting mouth)
-            pearl_direction = vector(-1, 0) if self.orientation == 'left' else vector(1, 0)
-            # create a pearl 
-            offset = (pearl_direction * 50) if self.orientation == 'left' else (pearl_direction * 20) ## To place pearl exactly inside the shoot_monster mouth(Hit & Trail Value)
-            offset += vector(0, -10) # Vertically center the pearl to the level of shoot_monster mouth
-            Pearl(self.rect.center + offset, pearl_direction, self.pearl_surface, [self.groups()[0], self.damage_sprites]) # self.groups()[0]: all_sprites group
+        if int(self.frame_index) == 2 and self.status == 'attack' and not self.has_shot: ## Only shoot shoot_monster_bullet when shoot_monster is at frame 3 (showing shooting mouth)
+            shoot_monster_bullet_direction = vector(-1, 0) if self.orientation == 'left' else vector(1, 0)
+            # create a shoot_monster_bullet 
+            offset = (shoot_monster_bullet_direction * 50) if self.orientation == 'left' else (shoot_monster_bullet_direction * 20) ## To place shoot_monster_bullet exactly inside the shoot_monster mouth(Hit & Trail Value)
+            offset += vector(0, -10) # Vertically center the shoot_monster_bullet to the level of shoot_monster mouth
+            ShootMonsterBullet(self.rect.center + offset, shoot_monster_bullet_direction, [self.groups()[0], self.damage_sprites], self.num_qubits) # self.groups()[0]: all_sprites group
             self.has_shot = True
 
     def update(self, dt):
@@ -191,9 +193,16 @@ class ShootMonster(Generic):
         self.animate(dt)
         self.attack_cooldown.update()
 
-class Pearl(Generic):
-    def __init__(self, position, direction, surface, group):
-        super().__init__(position, surface, group)
+class ShootMonsterBullet(Generic):
+    def __init__(self, position, direction, group, num_qubits=3):
+        self.quantum_state = randint(0, pow(2, num_qubits) - 1)
+        print(self.quantum_state)
+        self.qubit_bullet_graphics = import_images_from_folder_as_dict('graphics/qubit_bullets')
+        
+        self.image = self.qubit_bullet_graphics[f'qb_{num_qubits}_{self.quantum_state}']
+        self.rect = self.image.get_rect(center = position)
+
+        super().__init__(position, self.image, group)
         self.mask = pygame.mask.from_surface(self.image)
 
         ## Movement
@@ -355,7 +364,8 @@ class Player(Generic):
 
     def create_qubit_bullet(self, qubit_bullet_state, num_qubits = 3):
         bullet_start_position = (WINDOW_WIDTH / 2 + 44, WINDOW_HEIGHT / 2)
-        return QubitBullet(qubit_bullet_state, bullet_start_position, num_qubits)
+        bullet_direction = 1 if self.orientation == 'right' else -1
+        return QubitBullet(qubit_bullet_state, bullet_start_position, bullet_direction, num_qubits)
 
     def update(self, dt):
         self.input()
@@ -368,16 +378,19 @@ class Player(Generic):
         self.animate(dt)
 
 class QubitBullet(pygame.sprite.Sprite):
-    def __init__(self, qubit_bullet_state, position, num_qubits = 3):
+    def __init__(self, qubit_bullet_state, position, direction = 1, num_qubits = 3):
         super().__init__()
         self.qubit_bullet_state = qubit_bullet_state
+        self.direction = direction
         self.qubit_bullet_graphics = import_images_from_folder_as_dict('graphics/qubit_bullets')
         self.image = self.qubit_bullet_graphics[f'qb_{num_qubits}_{self.qubit_bullet_state}']
-        # self.image.fill((250, 0, 0))
+        if self.direction == -1:
+            self.image = pygame.transform.flip(self.image, True, False)
         self.rect = self.image.get_rect(center = position)
 
+
     def update(self):
-        self.rect.x += 1
+        self.rect.x += 1 * self.direction
 
         if self.rect.x >= WINDOW_WIDTH + 200:
             self.kill()

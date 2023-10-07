@@ -41,7 +41,6 @@ class Main:
 			'spikes': self.spikes,
 			'crab_monster': self.crab_monster,
 			'shoot_monster': self.shoot_monster,
-			'pearl': self.pearl,
 			'player': self.player_graphics
 		}
 
@@ -97,7 +96,6 @@ class Main:
 		self.spikes = loadImage('graphics/enemies/spikes/spikes.png').convert_alpha()
 		self.crab_monster = {folder: import_images_from_folder(f'graphics/enemies/crab_monster/{folder}') for folder in list(walk('graphics/enemies/crab_monster'))[0][1]}
 		self.shoot_monster = {folder: import_images_from_folder(f'graphics/enemies/shoot_monster_left/{folder}') for folder in list(walk('graphics/enemies/shoot_monster_left'))[0][1]} # only importing shoot_monster_left as we can easily get all the graphics of shoot_monster_right by flipping the graphics of shoot_monster_left
-		self.pearl = loadImage('graphics/enemies/pearl/pearl.png').convert_alpha()
 
 		# player
 		self.player_graphics = {folder: import_images_from_folder(f'graphics/player/{folder}') for folder in list(walk('graphics/player'))[0][1]}

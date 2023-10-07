@@ -17,6 +17,22 @@ class CustomLevel:
         self.switch = switch
         self.level_grid = level_grid
 
+        ## Overworld
+        self.create_overworld = create_overworld
+        self.current_level = current_level
+        self.new_max_level = new_max_level
+
+        ## QuantumCircuitGrid
+        self.num_qubits = self.current_level + 1 if self.current_level < 3 else 3
+        if self.current_level == 0:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 1, 3)
+        elif self.current_level == 1:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 2, 4)
+        elif self.current_level == 2:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 3, 5)
+        else:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 3, 6)
+
         ## Objects/Sprites: Player, Trees, Qubit Bullets
         self.all_sprites = CameraGroup()
         self.coin_sprites = pygame.sprite.Group()
@@ -25,6 +41,7 @@ class CustomLevel:
         self.collision_sprites = pygame.sprite.Group()
         self.shoot_monster_sprites = pygame.sprite.Group()
         self.qubit_bullet_sprites = pygame.sprite.Group()
+
         ## UI
         self.bg_lvl1 = loadImage("graphics/background/1.png")
         self.health_bar = loadImage("graphics/ui/health_bar.png").convert_alpha()
@@ -37,7 +54,7 @@ class CustomLevel:
         self.shield_bar_topleft = (1230 - self.bar_max_width, 69)
         self.bar_height = 4
 
-        self.build_level(level_grid, asset_dictionary, audio['jump'])
+        self.build_level(level_grid, self.num_qubits, asset_dictionary, audio['jump'])
 
         ## Level Limits
         self.level_limits = {
@@ -63,23 +80,10 @@ class CustomLevel:
         self.hit_sound = audio['hit']
         self.hit_sound.set_volume(0.3)
 
-        ## Overworld
-        self.create_overworld = create_overworld
-        self.current_level = current_level
-        self.new_max_level = new_max_level
-
-        ## QuantumCircuitGrid
-        if self.current_level == 0:
-            self.qc_grid = QuantumCircuitGrid((30, 30), 1, 3)
-        elif self.current_level == 1:
-            self.qc_grid = QuantumCircuitGrid((30, 30), 2, 4)
-        elif self.current_level == 2:
-            self.qc_grid = QuantumCircuitGrid((30, 30), 3, 5)
-        else:
-            self.qc_grid = QuantumCircuitGrid((30, 30), 3, 6)
 
     ### DRAW LEVEL
-    def build_level(self, level_grid, asset_dictionary, jump_sound):
+    def build_level(self, level_grid, num_qubits, asset_dictionary, jump_sound):
+        
         for layer_name, layer in level_grid.items():
             for pos, data in layer.items():
                 if layer_name == 'terrain':
@@ -119,8 +123,8 @@ class CustomLevel:
                             assets = asset_dictionary['shoot_monster'], 
                             position = pos, 
                             group = [self.all_sprites, self.collision_sprites, self.shoot_monster_sprites], 
-                            pearl_surface = asset_dictionary['pearl'],
-                            damage_sprites = self.damage_sprites
+                            damage_sprites = self.damage_sprites,
+                            num_qubits = num_qubits
                         )
                     case 10: # ShootMonster pointing right
                         ShootMonster(
@@ -128,8 +132,8 @@ class CustomLevel:
                             assets = asset_dictionary['shoot_monster'], 
                             position = pos, 
                             group = [self.all_sprites, self.collision_sprites, self.shoot_monster_sprites], 
-                            pearl_surface = asset_dictionary['pearl'],
-                            damage_sprites = self.damage_sprites
+                            damage_sprites = self.damage_sprites,
+                            num_qubits = num_qubits
                         )
                     # (ii) They need to know where the player is
 
@@ -258,10 +262,6 @@ class CustomLevel:
                 quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
                 qubit_bullet_state = self.run_quantum_circuit(quantum_circuit)
                 num_qubits = self.current_level + 1 if self.current_level < 3 else 3
-                terrain_start = {
-                    'x': (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[0])[0],
-                    'y': (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[0])[1]
-                }
                 self.qubit_bullet_sprites.add(self.player.create_qubit_bullet(qubit_bullet_state, num_qubits))
                 self.player.qubit_bullets -= 1
             
