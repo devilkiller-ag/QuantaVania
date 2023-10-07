@@ -84,6 +84,8 @@ The quantum computing industry is growing rapidly, and there is a strong demand 
 
 <h2>Our Solution</h2>
 
+<p align="center"><b>“Bridging the gap between quantum computation industry need and students in the field of quantum computing by means of an interactive quantum sandbox game.”</b></p>
+
 <p>
 We are trying to bridge the gap between the quantum computation industry needs and students in the field of quantum computing by means of a quantum sandbox game that allows the player to learn the concepts of quantum computing from basics to advanced algorithms through puzzles and mining.
 </p>
