@@ -39,6 +39,31 @@ But, determined to escape this perilous condition, you go into the neon dungeons
 
 <!-- ------------------------------------------------------------------------- -->
 
+### Controls
+
+#### Player Movement
+- **Left Arrow key:** Move the player to the left.
+- **Right Arrow key:** Move the player to the right.
+- **Spacebar:** Jump.
+
+#### Actions
+- **Right Mouse Click:** Shoot Qubit Bullet with the state as per the measurement result of the quantum circuit built by the player and also save this state as the player's state.
+- **Left Mouse Click:** Save the player's state as per the measurement result of the quantum circuit built by the player.
+
+### Building Quantum Circuit
+- **W, A, S, D Keys:** Move the "Circuit Cursor" in the Quantum Circuit to the place where you want to add a gate in the circuit.
+- **Backspace Key:** Remove the gate present at the Circuit Cursor.
+- **Delete Key:** Clear the Quantum Circuit, i.e., remove all gates from the Quantum Circuit.
+- **X Key:** Add X Gate to the quantum circuit.
+- **Y Key:** Add Y Gate to the quantum circuit.
+- **Z Key:** Add Z Gate to the quantum circuit.
+- **H Key:** Add H Gate to the quantum circuit.
+- **C, R, E Keys:** Press **C Key** to convert the X, Y, Z, or H gates into CX, CY, CZ, and CH gates respectively, and then press **R Key** and **F Key** to the control to qubit above or below respectively.
+- **Q and E Keys:** To convert X, Y, and Z into RX, RY, and RZ gates respectively. **Q Key** decreases the rotation angle by π/8 and **E Key** increases the rotation angle by π/8.
+
+<!-- ------------------------------------------------------------------------- -->
+<hr />
+
 <h2>Problem we are trying to solve</h2>
 
 <p align="center"><b>“The gap between quantum computation industry needs and students in the field of quantum computing.”</b></p>
