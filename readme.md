@@ -8,7 +8,7 @@
 
 <!-- ------------------------------------------------------------------------- -->
 
-<h2>QuantaVania</h2>
+<h1>QuantaVania</h1>
 
 <p>
  QuantaVania is an action-adventure 2D platformer game with the potential to evolve into an open-world sandbox game in which players can learn quantum computing from the ground up while playing, design their own game level, and share it with others in the quantum community via our web platform, and mine qubits, quantum gates and power-ups. 
@@ -64,7 +64,7 @@ But, determined to escape this perilous condition, you go into the neon dungeons
 <!-- ------------------------------------------------------------------------- -->
 <hr />
 
-<h2>Problem we are trying to solve</h2>
+<h1>Problem we are trying to solve</h1>
 
 <p align="center"><b>“The gap between quantum computation industry needs and students in the field of quantum computing.”</b></p>
 
