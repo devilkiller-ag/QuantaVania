@@ -23,15 +23,15 @@ EDITOR_DATA = {
 	9:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shoot_monster_left.png',  'preview': 'graphics/preview/shoot_monster_left.png',  'graphics': 'graphics/enemies/shoot_monster_left/idle'},
 	10: {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shoot_monster_right.png', 'preview': 'graphics/preview/shoot_monster_right.png', 'graphics': 'graphics/enemies/shoot_monster_right/idle'},
 	
-	11: {'style': 'palm_fg', 'type': 'object', 'menu_type': 'palm fg', 'menu_surf': 'graphics/menu/small_fg.png', 'preview': 'graphics/preview/small_fg.png', 'graphics': 'graphics/terrain/palm/small_fg'},
-	12: {'style': 'palm_fg', 'type': 'object', 'menu_type': 'palm fg', 'menu_surf': 'graphics/menu/large_fg.png', 'preview': 'graphics/preview/large_fg.png', 'graphics': 'graphics/terrain/palm/large_fg'},
-	13: {'style': 'palm_fg', 'type': 'object', 'menu_type': 'palm fg', 'menu_surf': 'graphics/menu/left_fg.png',  'preview': 'graphics/preview/left_fg.png',  'graphics': 'graphics/terrain/palm/left_fg'},
-	14: {'style': 'palm_fg', 'type': 'object', 'menu_type': 'palm fg', 'menu_surf': 'graphics/menu/right_fg.png', 'preview': 'graphics/preview/right_fg.png', 'graphics': 'graphics/terrain/palm/right_fg'},
+	11: {'style': 'qcomp_fg', 'type': 'object', 'menu_type': 'qcomp fg', 'menu_surf': 'graphics/menu/small_fg.png', 'preview': 'graphics/preview/small_fg.png', 'graphics': 'graphics/terrain/qcomp/small_fg'},
+	12: {'style': 'qcomp_fg', 'type': 'object', 'menu_type': 'qcomp fg', 'menu_surf': 'graphics/menu/large_fg.png', 'preview': 'graphics/preview/large_fg.png', 'graphics': 'graphics/terrain/qcomp/large_fg'},
+	13: {'style': 'qcomp_fg', 'type': 'object', 'menu_type': 'qcomp fg', 'menu_surf': 'graphics/menu/left_fg.png',  'preview': 'graphics/preview/left_fg.png',  'graphics': 'graphics/terrain/qcomp/left_fg'},
+	14: {'style': 'qcomp_fg', 'type': 'object', 'menu_type': 'qcomp fg', 'menu_surf': 'graphics/menu/right_fg.png', 'preview': 'graphics/preview/right_fg.png', 'graphics': 'graphics/terrain/qcomp/right_fg'},
 
-	15: {'style': 'palm_bg', 'type': 'object', 'menu_type': 'palm bg', 'menu_surf': 'graphics/menu/small_bg.png', 'preview': 'graphics/preview/small_bg.png', 'graphics': 'graphics/terrain/palm/small_bg'},
-	16: {'style': 'palm_bg', 'type': 'object', 'menu_type': 'palm bg', 'menu_surf': 'graphics/menu/large_bg.png', 'preview': 'graphics/preview/large_bg.png', 'graphics': 'graphics/terrain/palm/large_bg'},
-	17: {'style': 'palm_bg', 'type': 'object', 'menu_type': 'palm bg', 'menu_surf': 'graphics/menu/left_bg.png',  'preview': 'graphics/preview/left_bg.png',  'graphics': 'graphics/terrain/palm/left_bg'},
-	18: {'style': 'palm_bg', 'type': 'object', 'menu_type': 'palm bg', 'menu_surf': 'graphics/menu/right_bg.png', 'preview': 'graphics/preview/right_bg.png', 'graphics': 'graphics/terrain/palm/right_bg'},
+	15: {'style': 'qcomp_bg', 'type': 'object', 'menu_type': 'qcomp bg', 'menu_surf': 'graphics/menu/small_bg.png', 'preview': 'graphics/preview/small_bg.png', 'graphics': 'graphics/terrain/qcomp/small_bg'},
+	16: {'style': 'qcomp_bg', 'type': 'object', 'menu_type': 'qcomp bg', 'menu_surf': 'graphics/menu/large_bg.png', 'preview': 'graphics/preview/large_bg.png', 'graphics': 'graphics/terrain/qcomp/large_bg'},
+	17: {'style': 'qcomp_bg', 'type': 'object', 'menu_type': 'qcomp bg', 'menu_surf': 'graphics/menu/left_bg.png',  'preview': 'graphics/preview/left_bg.png',  'graphics': 'graphics/terrain/qcomp/left_bg'},
+	18: {'style': 'qcomp_bg', 'type': 'object', 'menu_type': 'qcomp bg', 'menu_surf': 'graphics/menu/right_bg.png', 'preview': 'graphics/preview/right_bg.png', 'graphics': 'graphics/terrain/qcomp/right_bg'},
 }
 
 '''

@@ -35,14 +35,14 @@ class Menu:
         self.tile_button_area = generic_button_area.copy().inflate(-button_margin, -button_margin)
         self.coin_button_area = generic_button_area.copy().move(self.menu_area.width / 2, 0).inflate(-button_margin, -button_margin)
         self.enemy_button_area = generic_button_area.copy().move(0, self.menu_area.height / 2).inflate(-button_margin, -button_margin)
-        self.palm_button_area = generic_button_area.copy().move(self.menu_area.width / 2, self.menu_area.height / 2).inflate(-button_margin, -button_margin)
+        self.qcomp_button_area = generic_button_area.copy().move(self.menu_area.width / 2, self.menu_area.height / 2).inflate(-button_margin, -button_margin)
         
         ## Create Menu Buttons
         self.buttons = pygame.sprite.Group()
         MenuButton(self.tile_button_area, self.buttons, self.menu_surfaces['terrain'])
         MenuButton(self.coin_button_area, self.buttons, self.menu_surfaces['coin'])
         MenuButton(self.enemy_button_area, self.buttons, self.menu_surfaces['enemy'])
-        MenuButton(self.palm_button_area, self.buttons, self.menu_surfaces['palm fg'], self.menu_surfaces['palm bg'])
+        MenuButton(self.qcomp_button_area, self.buttons, self.menu_surfaces['qcomp fg'], self.menu_surfaces['qcomp bg'])
 
 
     def click(self, mouse_position, mouse_buttons):
@@ -68,8 +68,8 @@ class Menu:
             pygame.draw.rect(self.menu_display_surface, BUTTON_LINE_COLOR, self.coin_button_area.inflate(4, 4), 5, 4)
         elif EDITOR_DATA[index]['menu_type'] == 'enemy':
             pygame.draw.rect(self.menu_display_surface, BUTTON_LINE_COLOR, self.enemy_button_area.inflate(4, 4), 5, 4)
-        elif EDITOR_DATA[index]['menu_type'] in ('palm bg', 'palm fg'):
-            pygame.draw.rect(self.menu_display_surface, BUTTON_LINE_COLOR, self.palm_button_area.inflate(4, 4), 5, 4)
+        elif EDITOR_DATA[index]['menu_type'] in ('qcomp bg', 'qcomp fg'):
+            pygame.draw.rect(self.menu_display_surface, BUTTON_LINE_COLOR, self.qcomp_button_area.inflate(4, 4), 5, 4)
 
     def display(self, index):
         self.buttons.update()

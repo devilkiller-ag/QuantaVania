@@ -54,8 +54,8 @@ class Editor:
 
 		## Objects/Sprites: Player, Trees
 		self.canvas_objects = pygame.sprite.Group()
-		self.foreground_objects = pygame.sprite.Group() # to store foreground palm trees
-		self.background_objects = pygame.sprite.Group() # to store background palm trees
+		self.foreground_objects = pygame.sprite.Group() # to store foreground qcomp trees
+		self.background_objects = pygame.sprite.Group() # to store background qcomp trees
 		self.object_drag_active = False
 		self.object_timer = Timer(OBJECT_PLACING_DELAY_TIME) # To restrict player to draw another object (tree) just after placing first one. This will avoid the placing of thousands of objects (trees) on just draging the mouse after placing the first object (tree).
 
@@ -191,7 +191,7 @@ class Editor:
 		# create empty grid
 		layers = {
 			'water': {}, # Ex item (pos of key: type): (128, 64): 'water top' / 'water bottom'
-			'bg palms': {},
+			'bg qcomps': {},
 			'terrain': {}, # Ex item (pos of key: Filename): (128, 64): 'ABC'
 			'enemies': {},
 			'coins': {},
@@ -218,8 +218,8 @@ class Editor:
 			
 			if tile.objects: # (object, offset  from the topleft)
 				for obj, offset in tile.objects:
-					if obj in [key for key, value in EDITOR_DATA.items() if value['style'] == 'palm_bg']: # bg palm; key = [15, 16, 17, 18]
-						layers['bg palms'][(int(x + offset.x), int(y + offset.y))] = obj
+					if obj in [key for key, value in EDITOR_DATA.items() if value['style'] == 'qcomp_bg']: # bg qcomp; key = [15, 16, 17, 18]
+						layers['bg qcomps'][(int(x + offset.x), int(y + offset.y))] = obj
 					else: #fg objects
 						layers['fg objects'][(int(x + offset.x), int(y + offset.y))] = obj
 		
@@ -321,7 +321,7 @@ class Editor:
 			
 			else: ## ADD CANVAS OBJECT
 				if not self.object_timer.active:
-					groups = [self.canvas_objects, self.background_objects] if EDITOR_DATA[self.selection_index]['style'] == 'palm_bg' else [self.canvas_objects, self.foreground_objects] 
+					groups = [self.canvas_objects, self.background_objects] if EDITOR_DATA[self.selection_index]['style'] == 'qcomp_bg' else [self.canvas_objects, self.foreground_objects] 
 					CanvasObject(
 						pos = mouse_postion(), 
 						frames = self.animations[self.selection_index]['frames'], 
@@ -392,7 +392,7 @@ class Editor:
 		self.editor_display_surface.blit(self.grid_lines_surface, (0, 0))
 
 	def draw_level(self):
-		# Draw background objects (Background Palms, Sky Handle)
+		# Draw background objects (Background QComps, Sky Handle)
 		self.background_objects.draw(self.editor_display_surface)
 		
 		# Draw Tiles (Terrain, Water, Coin, Enemy)
@@ -431,7 +431,7 @@ class Editor:
 				enemy_rect_area = enemy_surface.get_rect(midbottom=(pos[0] + TILE_SIZE // 2, pos[1] + TILE_SIZE)) # to make the enemies touch the bottom of the grid_box/tile
 				self.editor_display_surface.blit(enemy_surface, enemy_rect_area)
 
-		# Draw foreground objects (Foreground Palms, Player)
+		# Draw foreground objects (Foreground QComps, Player)
 		self.foreground_objects.draw(self.editor_display_surface)
 
 	def preview(self):

@@ -145,29 +145,29 @@ class CustomLevel:
                         )
                     # (ii) They need to know where the player is
 
-                    ## Foreground Palm Trees
-                    case 11: # small palm fg
-                        AnimatedSprite(asset_dictionary['palms']['small_fg'], pos, self.all_sprites)
+                    ## Foreground QComp Trees
+                    case 11: # small qcomp fg
+                        AnimatedSprite(asset_dictionary['qcomps']['small_fg'], pos, self.all_sprites)
                         CollidableBlock(pos, (76, 50), [self.collision_sprites]) # Invisible because CollidableBlock is not added to to self.all_sprites and CollidableBlock iself do not have any draw method which can be called through self.collision_sprites
-                    case 12: # large palm fg
-                        AnimatedSprite(asset_dictionary['palms']['large_fg'], pos, self.all_sprites)
+                    case 12: # large qcomp fg
+                        AnimatedSprite(asset_dictionary['qcomps']['large_fg'], pos, self.all_sprites)
                         CollidableBlock(pos, (76, 50), [self.collision_sprites]) ## Hit & Trail Values
-                    case 13: # left palm fg
-                        AnimatedSprite(asset_dictionary['palms']['left_fg'], pos, self.all_sprites)
+                    case 13: # left qcomp fg
+                        AnimatedSprite(asset_dictionary['qcomps']['left_fg'], pos, self.all_sprites)
                         CollidableBlock(pos, (76, 50), [self.collision_sprites])
-                    case 14: # right palm fg
-                        AnimatedSprite(asset_dictionary['palms']['right_fg'], pos, self.all_sprites)
+                    case 14: # right qcomp fg
+                        AnimatedSprite(asset_dictionary['qcomps']['right_fg'], pos, self.all_sprites)
                         CollidableBlock(pos + vector(50, 0), (76, 50), [self.collision_sprites])
 
-                    ## Background Palm Trees
-                    case 15: # small palm bg
-                        AnimatedSprite(asset_dictionary['palms']['small_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
-                    case 16: # large palm bg
-                        AnimatedSprite(asset_dictionary['palms']['large_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
-                    case 17: # left palm bg
-                        AnimatedSprite(asset_dictionary['palms']['left_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
-                    case 18: # right palm bg
-                        AnimatedSprite(asset_dictionary['palms']['right_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
+                    ## Background QComp Trees
+                    case 15: # small qcomp bg
+                        AnimatedSprite(asset_dictionary['qcomps']['small_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
+                    case 16: # large qcomp bg
+                        AnimatedSprite(asset_dictionary['qcomps']['large_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
+                    case 17: # left qcomp bg
+                        AnimatedSprite(asset_dictionary['qcomps']['left_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
+                    case 18: # right qcomp bg
+                        AnimatedSprite(asset_dictionary['qcomps']['right_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
             
         for sprite in self.shoot_monster_sprites:
             sprite.player = self.player
