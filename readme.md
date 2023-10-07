@@ -76,6 +76,7 @@ python main.py
 ```
 
 <h3>Detailed Instruction</h3>
+
 1. Clone the repository to your local machine:
 
    ```bash
