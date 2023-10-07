@@ -62,6 +62,45 @@ But, determined to escape this perilous condition, you go into the neon dungeons
 - **Q and E Keys:** To convert X, Y, and Z into RX, RY, and RZ gates respectively. **Q Key** decreases the rotation angle by π/8 and **E Key** increases the rotation angle by π/8.
 
 <!-- ------------------------------------------------------------------------- -->
+<h2>Installation Instruction</h2>
+To download and play QuantaVania, follow these steps:
+
+1. Clone the repository to your local machine:
+
+   ```bash
+   git clone https://github.com/your-username/your-repo.git
+   ```
+2. Navigate to the game directory:
+
+   ```bash
+   cd QuantaVania
+   ```
+3. Create a virtual environment (optional but recommended):
+    ```bash
+    python -m venv qvenv
+    ```
+4. Activate the virtual environment:
+    - On Windows:
+      ```bash
+      qvenv\Scripts\activate
+      ```
+    - On macOS and Linux:
+      ```bash
+      source qvenv/bin/activate
+      ```
+5. Install dependencies:
+     ```bash
+     pip install -r requirements.txt
+     ```
+6. Navigate to the game code directory:
+   ```bash
+   cd code
+   ```
+7. Run main.py to play the QuantaVania Game:
+   ```bash
+   python main.py
+   ```
+<!-- ------------------------------------------------------------------------- -->
 <hr />
 
 <h1>Problem we are trying to solve</h1>
