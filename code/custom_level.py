@@ -42,6 +42,7 @@ class CustomLevel:
         self.collision_sprites = pygame.sprite.Group()
         self.shoot_monster_sprites = pygame.sprite.Group()
         self.qubit_bullet_sprites = pygame.sprite.Group()
+        # self.explosion_sprites = pygame.sprite.Group()
 
         ## UI
         self.bg_lvl1 = loadImage("graphics/background/1.png")
@@ -123,7 +124,7 @@ class CustomLevel:
                     case 7: # Spikes
                         Spikes(asset_dictionary['spikes'], pos, [self.all_sprites, self.damage_sprites])
                     case 8: # CrabMonster
-                        CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.damage_sprites, self.destroyable_enemies_sprites], self.collision_sprites, self.num_qubits)
+                        CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.destroyable_enemies_sprites], self.collision_sprites, self.all_sprites, self.num_qubits)
                     case 9: # ShootMonster pointing left
                         ShootMonster(
                             orientation = 'left', 
@@ -231,6 +232,28 @@ class CustomLevel:
         if collision_sprites:
             self.hit_sound.play()
             self.player.damage()
+        
+        collision_destroyable_sprites  = pygame.sprite.spritecollide(self.player, self.destroyable_enemies_sprites, False, pygame.sprite.collide_mask)
+        if collision_destroyable_sprites:
+            self.hit_sound.play()
+            for destroyable_enemy in collision_destroyable_sprites:
+                enemy_center = destroyable_enemy.rect.centery
+                enemy_top = destroyable_enemy.rect.top
+                player_bottom = self.player.rect.bottom
+                if enemy_top < player_bottom < enemy_center and self.player.direction[1] >= 0:
+                    self.player.direction[1] = -1
+
+                    dot_product_value = self.calculate_dot_product(self.player.quantum_state, destroyable_enemy.state, self.num_qubits)
+                    if dot_product_value == 0:
+                        if destroyable_enemy.health > 0:
+                            destroyable_enemy.health -= min(destroyable_enemy.health, 30)
+                    else:
+                        if destroyable_enemy.health < destroyable_enemy.max_health:
+                            destroyable_enemy.health += min(destroyable_enemy.max_health - destroyable_enemy.health, 10)
+
+                else:
+                    self.player.damage()
+
 
     def calculate_dot_product(self, hero_state, enemy_state, num_qubits):
         hero_state = bin(hero_state)[2:].zfill(num_qubits)
@@ -247,7 +270,7 @@ class CustomLevel:
             for destroyable_enemy in self.destroyable_enemies_sprites:
                 if qubit_bullet.rect.colliderect(destroyable_enemy.rect) and pygame.sprite.collide_mask(qubit_bullet, destroyable_enemy):
                     print("Collision!!")
-                    dot_product_value = self.calculate_dot_product(qubit_bullet.qubit_bullet_state, destroyable_enemy.state)
+                    dot_product_value = self.calculate_dot_product(qubit_bullet.qubit_bullet_state, destroyable_enemy.state, self.num_qubits)
                     if dot_product_value == 0:
                         if destroyable_enemy.health > 0:
                             destroyable_enemy.health -= min(destroyable_enemy.health, 30)
@@ -288,13 +311,18 @@ class CustomLevel:
                 if event.type == pygame.KEYDOWN:
                     self.qc_grid.handle_input(event.key)
 
-                # Shoot Qubit Bullets
+                # Shoot Qubit Bullets and set player quantum state
                 if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[2]):
                     quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
-                    qubit_bullet_state = self.run_quantum_circuit(quantum_circuit)
+                    qubit_bullet_state = self.player.quantum_state = self.run_quantum_circuit(quantum_circuit)
                     num_qubits = self.current_level + 1 if self.current_level < 3 else 3
                     self.qubit_bullet_sprites.add(self.player.create_qubit_bullet(qubit_bullet_state, num_qubits))
                     self.player.qubit_bullets -= 1
+
+                # Set Player Quantum State
+                if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[0]):
+                    quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
+                    self.player.quantum_state = self.run_quantum_circuit(quantum_circuit)
 
                 # Exit Dialog Box
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:

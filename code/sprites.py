@@ -79,11 +79,13 @@ class Spikes(Generic):
         self.mask = pygame.mask.from_surface(self.image)
 
 class CrabMonster(Generic):
-    def __init__(self, assets, position, group, collision_sprites, num_qubits = 3):
+    def __init__(self, assets, position, group, collision_sprites, all_sprites_group, num_qubits = 3):
         ## Health & State
         self.state = randint(0, pow(2, num_qubits) - 1)
         self.max_health = 100
         self.health = 100
+        self.explosion_surfaces = import_images_from_folder('graphics/items/explosion')
+        self.all_sprites_group = all_sprites_group
 
         ## Animation
         self.animation_frames = assets
@@ -155,7 +157,8 @@ class CrabMonster(Generic):
         self.rect.x = round(self.position.x)
 
     def check_death(self):
-        if self.health <= 0:
+        if self.health <= 30:
+            explosion_sprite = ParticleEffect(self.explosion_surfaces, self.rect.center, self.all_sprites_group)
             self.kill()
 
     def update(self, dt):
@@ -264,6 +267,7 @@ class Player(Generic):
         self.shield_damage = self.max_shield_damage - initial_shield
         
         ## Qubit Bullets
+        self.quantum_state = 0
         self.qubit_bullets = qubit_bullet
         self.qubit_bullet_group = qubit_bullet_group
 
