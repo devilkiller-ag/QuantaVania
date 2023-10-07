@@ -225,12 +225,29 @@ class CustomLevel:
             self.hit_sound.play()
             self.player.damage()
 
+    def calculate_dot_product(self, hero_state, enemy_state, num_qubits):
+        hero_state = bin(hero_state)[2:].zfill(num_qubits)
+        enemy_state = bin(enemy_state)[2:].zfill(num_qubits)
+
+        if len(hero_state) != len(enemy_state):
+            raise ValueError("Bit strings must have the same length for dot product calculation!")
+
+        dot_product = sum(int(bit1) * int(bit2) for bit1, bit2 in zip(hero_state, enemy_state))
+        return dot_product
+
     def destroy_enemy(self):
         for qubit_bullet in self.qubit_bullet_sprites:
             for destroyable_enemy in self.destroyable_enemies_sprites:
-                print(qubit_bullet, destroyable_enemy)
-                if qubit_bullet.rect.colliderect(destroyable_enemy.rect):
+                if qubit_bullet.rect.colliderect(destroyable_enemy.rect) and pygame.sprite.collide_mask(qubit_bullet, destroyable_enemy):
                     print("Collision!!")
+                    dot_product_value = self.calculate_dot_product(qubit_bullet.qubit_bullet_state, destroyable_enemy.state)
+                    if dot_product_value == 0:
+                        if destroyable_enemy.health > 0:
+                            destroyable_enemy.health -= min(destroyable_enemy.health, 30)
+                    else:
+                        if destroyable_enemy.health < destroyable_enemy.max_health:
+                            destroyable_enemy.health += min(destroyable_enemy.max_health - destroyable_enemy.health, 10)
+                    qubit_bullet.kill()
 
     def check_death(self):
         if self.player.position.y > WINDOW_HEIGHT or self.player.health_damage >= 100:
@@ -302,6 +319,8 @@ class CustomLevel:
         self.show_health(self.player.health_damage, self.player.max_health_damage)
         self.show_shield(self.player.shield_damage, self.player.max_shield_damage)
         self.show_coin(self.player.qubit_bullets)
+
+        print(self.calculate_dot_product(2, 1, 2))
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):

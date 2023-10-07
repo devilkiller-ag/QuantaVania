@@ -79,7 +79,12 @@ class Spikes(Generic):
         self.mask = pygame.mask.from_surface(self.image)
 
 class CrabMonster(Generic):
-    def __init__(self, assets, position, group, collision_sprites):
+    def __init__(self, assets, position, group, collision_sprites, num_qubits = 3):
+        ## Health & State
+        self.state = randint(0, pow(2, num_qubits) - 1)
+        self.max_health = 100
+        self.health = 100
+
         ## Animation
         self.animation_frames = assets
         self.frame_index = 0
@@ -88,6 +93,7 @@ class CrabMonster(Generic):
         super().__init__(position, surface, group)
         self.rect.bottom = self.rect.top + TILE_SIZE
         self.mask = pygame.mask.from_surface(self.image)
+        self.image.set_alpha((self.health / self.max_health) * 255)
 
         ## Movement
         self.direction = vector(choice((1, -1)), 0)
@@ -105,8 +111,9 @@ class CrabMonster(Generic):
         self.frame_index += ANIMATION_SPEED * dt
         self.frame_index = 0 if self.frame_index >= len(current_animation) else self.frame_index
         self.image = current_animation[int(self.frame_index)]
-        self.image.fill("white")
+        # self.image.fill("white")
         self.mask = pygame.mask.from_surface(self.image)
+        self.image.set_alpha((self.health / self.max_health) * 255)
     
     def move(self, dt):
         right_gap = self.rect.bottomright + vector(1, 1) # Gap at the bottom right corner of the monster sprite (we will use it detect clif side on it's right)
@@ -137,9 +144,14 @@ class CrabMonster(Generic):
         self.position.x += self.direction.x * self.speed * dt
         self.rect.x = round(self.position.x)
 
+    def check_death(self):
+        if self.health <= 0:
+            self.kill()
+
     def update(self, dt):
         self.animate(dt)
         self.move(dt)
+        self.check_death()
 
 class ShootMonster(Generic):
     def __init__(self, orientation, assets, position, group, damage_sprites, num_qubits=3):
@@ -382,12 +394,15 @@ class QubitBullet(pygame.sprite.Sprite):
         super().__init__()
         self.qubit_bullet_state = qubit_bullet_state
         self.direction = direction
+
         self.qubit_bullet_graphics = import_images_from_folder_as_dict('graphics/qubit_bullets')
         self.image = self.qubit_bullet_graphics[f'qb_{num_qubits}_{self.qubit_bullet_state}']
+
         if self.direction == -1:
             self.image = pygame.transform.flip(self.image, True, False)
         self.rect = self.image.get_rect(center = position)
 
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self):
         self.rect.x += 1 * self.direction
