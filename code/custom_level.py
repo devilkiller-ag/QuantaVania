@@ -228,7 +228,7 @@ class CustomLevel:
                 # print('diamond')
 
     def get_damage(self):
-        collision_sprites = pygame.sprite.spritecollide(self.player, self.damage_sprites, False, pygame.sprite.collide_mask)
+        collision_sprites = pygame.sprite.spritecollide(self.player, self.damage_sprites, True, pygame.sprite.collide_mask)
         if collision_sprites:
             self.hit_sound.play()
             self.player.damage()
