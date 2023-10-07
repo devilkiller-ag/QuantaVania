@@ -232,12 +232,6 @@ class Editor:
 			if event.type == pygame.QUIT:
 				pygame.quit()
 				sys.exit()
-
-			# Switch to Play Mode When user press ENTER (EXPORT MAP AND CREATE ACTUAL LEVEL)
-			# if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-			# 	self.editor_music.stop()
-			# 	export_layer_data = self.create_grid()
-			# 	self.switch(export_layer_data)
 			
 			self.pan_input(event) # pass the event to pan_input to detect if user wants to pan the editor area and act accordingly
 			self.selection_hotkeys(event)
@@ -296,7 +290,7 @@ class Editor:
 				if mouse_buttons()[2]: # right mouse click
 					export_layer_data = self.create_grid()
 					###################### INPUT #################
-					self.saveloadmanager.save_data(export_layer_data, "level_6")
+					self.saveloadmanager.save_data(export_layer_data, "level_0")
 					self.create_overworld(self.current_level, self.new_max_level)
 
 			# Switch to Play Mode When user press Play Button (EXPORT MAP AND CREATE ACTUAL LEVEL)
