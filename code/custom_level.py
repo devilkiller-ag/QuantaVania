@@ -297,7 +297,7 @@ class CustomLevel:
                     self.player.qubit_bullets -= 1
 
                 # Exit Dialog Box
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_o:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     if self.dialog_box.is_active:
                         self.dialog_box.next_message()
     

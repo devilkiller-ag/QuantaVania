@@ -50,13 +50,12 @@ class DialogBox(pygame.sprite.Sprite):
         self.display_surface.blit(self.image, self.position)
         # self.write_message()
 
+        if self.current_message_index < len(self.messages):
+            self.message = self.messages[self.current_message_index]
+            self.write_message()
+
         ## Diplay Dialog Box Navigation Message
         nav_message = "Press ENTER to continue..."
         nav_message_surface = self.font.render(nav_message, False, self.message_color)
         nav_message_rect = nav_message_surface.get_rect(midbottom = (self.width/2, self.height - 20))
         self.image.blit(nav_message_surface, nav_message_rect)
-
-        if self.current_message_index < len(self.messages):
-            self.message = self.messages[self.current_message_index]
-            self.write_message()
-
