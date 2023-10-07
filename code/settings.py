@@ -76,6 +76,7 @@ SHIELD_BAR_COLOR = '#4b527e'
 QUANTUM_CIRCUIT_BG_COLOR = '#444654'
 QUANTUM_CIRCUIT_WIRE_COLOR = '#ffffff'
 QUANTUM_GATE_PHASE_COLOR = '#97ad40'
+DIALOG_TEXT_COLOR = '#000000'
 
 # player settings
 PLAYER_SPEED = 300
@@ -140,3 +141,32 @@ QUANTUM_CIRCUIT_MARKER_MOVE_LEFT = 1
 QUANTUM_CIRCUIT_MARKER_MOVE_RIGHT = 2
 QUANTUM_CIRCUIT_MARKER_MOVE_UP = 3
 QUANTUM_CIRCUIT_MARKER_MOVE_DOWN = 4
+
+## LEVEL DIALOGUES
+LEVEL_DIALOGUES = {
+    'level_0': [
+        "QuantaVania is an action-adventure 2D platformer game with the potential to evolve into an open-world sandbox game in which players can learn quantum computing from the ground up while playing, design their own game level and share it with others in the quantum community via our web platform, and mine qubits, quantum gates and power-ups. \nOur game will not only allow them to run the game on their local device but also on real quantum computers and simulators from various quantum computing providers like IBM Quantum, IONQ, Rigetti Computing, etc.",
+        
+        "We intend to teach the player quantum computing as they go through the levels. We'll expose them to qubits in the first level, and then they'll have to find the X-Gate hiding behind any box or monster. As the levels progresses, the player will discover new gates that he may use in the gun circuit. And, at the end of each level, we will introduce to the user each quantum algorithm, from basic to advanced, in the form of a game problem.",
+    ],
+    'level_1': [
+        "This is \nQuantaVania \n Level 2: Dialogue 1!",
+        "This is \nQuantaVania \n Level 2: Dialogue 2!",
+        "This is \nQuantaVania \n Level 2: Dialogue 3!",
+    ],
+    'level_2': [
+        "This is \nQuantaVania \n Level 3: Dialogue 1!",
+        "This is \nQuantaVania \n Level 3: Dialogue 2!",
+        "This is \nQuantaVania \n Level 3: Dialogue 3!",
+    ],
+    'level_3': [
+        "This is \nQuantaVania \n Level 4: Dialogue 1!",
+        "This is \nQuantaVania \n Level 4: Dialogue 2!",
+        "This is \nQuantaVania \n Level 4: Dialogue 3!",
+    ],
+    'level_4': [
+        "This is \nQuantaVania \n Level 5: Dialogue 1!",
+        "This is \nQuantaVania \n Level 5: Dialogue 2!",
+        "This is \nQuantaVania \n Level 5: Dialogue 3!",
+    ],
+}

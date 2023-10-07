@@ -10,6 +10,7 @@ from settings import *
 from support import *
 from sprites import Generic, CollidableBlock, Cloud, AnimatedSprite, ParticleEffect, Coin, Spikes, CrabMonster, ShootMonster, Player
 from quantum_circuit import QuantumCircuitGrid
+from dialog_box import DialogBox
 
 class CustomLevel:
     def __init__(self, current_level, new_max_level, level_grid, switch, create_overworld, asset_dictionary, audio):
@@ -54,6 +55,12 @@ class CustomLevel:
         self.shield_bar_topleft = (1230 - self.bar_max_width, 69)
         self.bar_height = 4
 
+        ## Dialog Box
+        self.dialog_box_active = True
+        self.level_dialogues = LEVEL_DIALOGUES[f'level_{self.current_level}']
+        self.dialog_box = DialogBox(800, 400, (250, 150), self.level_display_surface, self.level_dialogues, self.dialog_box_active)
+
+        ## Build Level
         self.build_level(level_grid, self.num_qubits, asset_dictionary, audio['jump'])
 
         ## Level Limits
@@ -265,25 +272,34 @@ class CustomLevel:
                 pygame.quit()
                 sys.exit()
             
-            if event.type == pygame.KEYDOWN:
-                self.qc_grid.handle_input(event.key)
-
-
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.bg_music.stop()
                 # self.switch()
                 self.create_overworld(2, 3)
-
-            # Shoot Qubit Bullets
-            if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[2]):
-                quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
-                qubit_bullet_state = self.run_quantum_circuit(quantum_circuit)
-                num_qubits = self.current_level + 1 if self.current_level < 3 else 3
-                self.qubit_bullet_sprites.add(self.player.create_qubit_bullet(qubit_bullet_state, num_qubits))
-                self.player.qubit_bullets -= 1
             
             if event.type == self.cloud_timer:
                 self.create_cloud()
+
+            if not self.dialog_box_active:
+                # Player Movement
+                self.player.input()
+
+                # Quantum Grid Inputs
+                if event.type == pygame.KEYDOWN:
+                    self.qc_grid.handle_input(event.key)
+
+                # Shoot Qubit Bullets
+                if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[2]):
+                    quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
+                    qubit_bullet_state = self.run_quantum_circuit(quantum_circuit)
+                    num_qubits = self.current_level + 1 if self.current_level < 3 else 3
+                    self.qubit_bullet_sprites.add(self.player.create_qubit_bullet(qubit_bullet_state, num_qubits))
+                    self.player.qubit_bullets -= 1
+
+                # Exit Dialog Box
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_o:
+                    if self.dialog_box.is_active:
+                        self.dialog_box.next_message()
     
     def run_quantum_circuit(self, quantum_circuit):
         simulator = BasicAer.get_backend("statevector_simulator")
@@ -320,7 +336,7 @@ class CustomLevel:
         self.show_shield(self.player.shield_damage, self.player.max_shield_damage)
         self.show_coin(self.player.qubit_bullets)
 
-        print(self.calculate_dot_product(2, 1, 2))
+        self.dialog_box.run()
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):

@@ -380,7 +380,7 @@ class Player(Generic):
         return QubitBullet(qubit_bullet_state, self.qubit_bullet_group, bullet_start_position, bullet_direction, num_qubits)
 
     def update(self, dt):
-        self.input()
+        # self.input()
         self.apply_gravity(dt)
         self.move(dt)
         self.check_on_floor()
