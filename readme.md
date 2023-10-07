@@ -39,18 +39,18 @@ But, determined to escape this perilous condition, you go into the neon dungeons
 
 <!-- ------------------------------------------------------------------------- -->
 
-### Controls
+<h2>Controls</h2>
 
-#### Player Movement
+**Player Movement**
 - **Left Arrow key:** Move the player to the left.
 - **Right Arrow key:** Move the player to the right.
 - **Spacebar:** Jump.
 
-#### Actions
+**Actions**
 - **Right Mouse Click:** Shoot Qubit Bullet with the state as per the measurement result of the quantum circuit built by the player and also save this state as the player's state.
 - **Left Mouse Click:** Save the player's state as per the measurement result of the quantum circuit built by the player.
 
-### Building Quantum Circuit
+**Building Quantum Circuit**
 - **W, A, S, D Keys:** Move the "Circuit Cursor" in the Quantum Circuit to the place where you want to add a gate in the circuit.
 - **Backspace Key:** Remove the gate present at the Circuit Cursor.
 - **Delete Key:** Clear the Quantum Circuit, i.e., remove all gates from the Quantum Circuit.
