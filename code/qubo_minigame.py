@@ -82,6 +82,10 @@ class MiniGame:
         pf_bar = Bar(906,60,45,385,self.pf_min, self.pf_max)
         r_bar = Bar(150,550,1066,45,r_min,r_max)
 
+    def draw_bg(self):
+        bg= pygame.image.load("graphics/ui/minigame bg.png").convert_alpha()
+        minigame_surface.blit(bg, (0,0))
+
     def draw_text(self, energy_txt, pf_text, r_text):
         energy_surface = pygame.font.render(f"Objective energy: {energy_txt}",False, DIALOG_TEXT_COLOR)
         pf_surface = pygame.font.render(f"Probability of Feasibility: {pf_txt}",False, DIALOG_TEXT_COLOR)
@@ -113,8 +117,12 @@ class MiniGame:
             #self.create_mainmenu()
     def run(self):
         self.event_loop
-        self.input()
-        self.draw_text()
-        self.draw_bars()
+        self.draw_bg
         self.draw_buttons()
+        self.input()
+        self.draw_bars()
         self.draw_graphs()
+        self.draw_text()
+        
+
+        
