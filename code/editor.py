@@ -290,7 +290,7 @@ class Editor:
 				if mouse_buttons()[2]: # right mouse click
 					export_layer_data = self.create_grid()
 					###################### INPUT #################
-					self.saveloadmanager.save_data(export_layer_data, "level_0")
+					self.saveloadmanager.save_data(export_layer_data, "level_2")
 					self.create_overworld(self.current_level, self.new_max_level)
 
 			# Switch to Play Mode When user press Play Button (EXPORT MAP AND CREATE ACTUAL LEVEL)
