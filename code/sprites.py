@@ -102,10 +102,19 @@ class CrabMonster(Generic):
         self.speed  = 120
         self.collision_sprites = collision_sprites
 
-        ## Destroy tooth at the beginning if he is not on the floor
+        ## Destroy crab monster at the beginning if he is not on the floor
         if not [sprite for sprite in self.collision_sprites if sprite.rect.collidepoint(self.rect.midbottom + vector(0, 10))]:
             self.kill()
-    
+
+        ## Blit State of Enemy on it's face
+        self.state_bg_surface = pygame.surface.Surface((30, 24))
+        self.state_bg_surface.fill("white")
+        self.image.blit(self.state_bg_surface, (40, 8))
+        self.font = pygame.font.Font("graphics/ui/ARCADEPI.TTF", 10)
+        self.state_text = self.font.render(f"|{bin(self.state)[2:].zfill(num_qubits)}>", False, DIALOG_TEXT_COLOR)
+        self.state_text_rect = self.state_text.get_rect(center = (18, 12))
+        self.state_bg_surface.blit(self.state_text, self.state_text_rect)
+
     def animate(self, dt):
         current_animation = self.animation_frames[f'run_{self.orientation}']
         self.frame_index += ANIMATION_SPEED * dt
@@ -113,6 +122,7 @@ class CrabMonster(Generic):
         self.image = current_animation[int(self.frame_index)]
         # self.image.fill("white")
         self.mask = pygame.mask.from_surface(self.image)
+        self.image.blit(self.state_bg_surface, (40, 8))
         self.image.set_alpha((self.health / self.max_health) * 255)
     
     def move(self, dt):

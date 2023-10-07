@@ -56,7 +56,7 @@ class CustomLevel:
         self.bar_height = 4
 
         ## Dialog Box
-        self.dialog_box_active = True
+        self.dialog_box_active = False
         self.level_dialogues = LEVEL_DIALOGUES[f'level_{self.current_level}']
         self.dialog_box = DialogBox(800, 400, (250, 150), self.level_display_surface, self.level_dialogues, self.dialog_box_active)
 
@@ -123,7 +123,7 @@ class CustomLevel:
                     case 7: # Spikes
                         Spikes(asset_dictionary['spikes'], pos, [self.all_sprites, self.damage_sprites])
                     case 8: # CrabMonster
-                        CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.damage_sprites, self.destroyable_enemies_sprites], self.collision_sprites)
+                        CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.damage_sprites, self.destroyable_enemies_sprites], self.collision_sprites, self.num_qubits)
                     case 9: # ShootMonster pointing left
                         ShootMonster(
                             orientation = 'left', 
@@ -336,7 +336,7 @@ class CustomLevel:
         self.show_shield(self.player.shield_damage, self.player.max_shield_damage)
         self.show_coin(self.player.qubit_bullets)
 
-        self.dialog_box.run()
+        # self.dialog_box.run()
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):

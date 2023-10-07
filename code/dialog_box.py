@@ -59,3 +59,7 @@ class DialogBox(pygame.sprite.Sprite):
         nav_message_surface = self.font.render(nav_message, False, self.message_color)
         nav_message_rect = nav_message_surface.get_rect(midbottom = (self.width/2, self.height - 20))
         self.image.blit(nav_message_surface, nav_message_rect)
+
+        # self.is_active = False
+        # if not self.is_active:
+        #     self.kill()
