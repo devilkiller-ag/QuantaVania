@@ -2,6 +2,7 @@ import pygame,sys
 
 from settings import *
 from support import import_images_from_folder
+from qubo_challenge.py import *
 
 class Buttons:
     def __init__(self, x, y, image, scale):
@@ -33,7 +34,7 @@ class Bar:
         self.h = h
         self.range_min = range_min
         self.range_max = range_max
-        self.current = range_min
+        self.current = range_max
 
     def draw(self, surface):
         ratio = (self.current - self.range_min)/(self.range_max-self.range_min)
@@ -42,12 +43,13 @@ class Bar:
 
 
 class MiniGame:
-    def __init__(self, surface, file_name, pf_max, pf_min, r_max, r_min):
+    def __init__(self, surface, file_name):
         self.file_name= file_name
-        self.pf_max = pf_max
-        self.pf_min = pf_min
-        self.r_max = r_max
-        self.r_min = r_min
+        self.pf_max = 1
+        self.pf_min = 0
+        self.r_max = PARAMETER_RANGE[file_name][0]
+        self.r_min = PARAMETER_RANGE[file_name][1]
+        QuboInstance = SolveQubo(file_name)
         self.minigame_surface = surface
         self.font = pygame.font.Font("graphics/ui/ARCADEPI.TTF" , 20)
         
@@ -79,8 +81,6 @@ class MiniGame:
     def draw_bars(self):
         pf_bar = Bar(906,60,45,385,self.pf_min, self.pf_max)
         r_bar = Bar(150,550,1066,45,r_min,r_max)
-        pf_bar.current()
-        r_bar.current()
 
     def draw_text(self, energy_txt, pf_text, r_text):
         energy_surface = pygame.font.render(f"Objective energy: {energy_txt}",False, DIALOG_TEXT_COLOR)
@@ -99,9 +99,23 @@ class MiniGame:
 
     def input(self):
         if increment_button.draw(self.minigame_surface):
-            print(increase)
-        if decrement_button.draw(self.minigame_surface:
-            )
-
+            print("increase")
+            r_bar.current += (self.r_max-self.r_min)/100
+        if decrement_button.draw(self.minigame_surface):
+            print("decrease") 
+            r_bar.current -= (self.r_max-self.r_min)/100
+        if calculate_button.draw(self.minigame_surface):
+            print("calculate")
+            pf_bar.current, energy_txt = QuboInstance.run()
+            self.draw_text(energy_txt,pf_bar.current, r_bar.current)
+        if back_button.draw(self.minigame_surface):
+            print("go back to main menu")
+            #self.create_mainmenu()
     def run(self):
         self.event_loop
+        self.input()
+        self.draw_text()
+        self.draw_bars()
+        self.draw_buttons()
+        self.draw_graphs()
+        

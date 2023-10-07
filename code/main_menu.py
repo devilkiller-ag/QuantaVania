@@ -26,4 +26,4 @@ class Buttons:
 
 class MainMenu:
     def __init__(self):
-        
+        self

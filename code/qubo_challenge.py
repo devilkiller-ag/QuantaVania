@@ -171,9 +171,3 @@ def solve_for_instances(nodes_matrix, relaxation_parameter, Token=None, token_gi
     E_std = math.sqrt((s/128))
     return best_sample, num_broken, P_f, E_avg, E_std, E_min, cities  #returns bestsample, relaxation parameter, Pf, min, mean and std of energies
 
-def read_dataset(dataset):
-
-    return 
-
-solve1 = SolveQubo("challenges\pr1002.tsp")
-print(solve1.run(3000))
