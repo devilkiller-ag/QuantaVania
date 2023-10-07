@@ -2,7 +2,7 @@ import pygame,sys
 
 from settings import *
 from support import import_images_from_folder
-from qubo_challenge.py import *
+from qubo_challenge import *
 
 class Buttons:
     def __init__(self, x, y, image, scale):
@@ -118,4 +118,3 @@ class MiniGame:
         self.draw_bars()
         self.draw_buttons()
         self.draw_graphs()
-        
