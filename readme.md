@@ -65,6 +65,17 @@ But, determined to escape this perilous condition, you go into the neon dungeons
 <h2>Installation Instruction</h2>
 To download and play QuantaVania, follow these steps:
 
+<h3>Quick Instruction</h3>
+
+```bash
+git clone https://github.com/your-username/your-repo.git
+cd QuantaVania
+pip install -r requirements.txt
+cd code
+python main.py
+```
+
+<h3>Detailed Instruction</h3>
 1. Clone the repository to your local machine:
 
    ```bash
