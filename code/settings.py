@@ -20,18 +20,18 @@ EDITOR_DATA = {
 
 	7:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/spikes.png',      'preview': 'graphics/preview/spikes.png',      'graphics': 'graphics/enemies/spikes'},
 	8:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/crab_monster.png',       'preview': 'graphics/preview/crab_monster.png',       'graphics': 'graphics/enemies/crab_monster/idle'},
-	9:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shell_left.png',  'preview': 'graphics/preview/shell_left.png',  'graphics': 'graphics/enemies/shell_left/idle'},
-	10: {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shell_right.png', 'preview': 'graphics/preview/shell_right.png', 'graphics': 'graphics/enemies/shell_right/idle'},
+	9:  {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shoot_monster_left.png',  'preview': 'graphics/preview/shoot_monster_left.png',  'graphics': 'graphics/enemies/shoot_monster_left/idle'},
+	10: {'style': 'enemy', 'type': 'tile', 'menu_type': 'enemy', 'menu_surf': 'graphics/menu/shoot_monster_right.png', 'preview': 'graphics/preview/shoot_monster_right.png', 'graphics': 'graphics/enemies/shoot_monster_right/idle'},
 	
-	11: {'style': 'palm_fg', 'type': 'object', 'menu_type': 'palm fg', 'menu_surf': 'graphics/menu/small_fg.png', 'preview': 'graphics/preview/small_fg.png', 'graphics': 'graphics/terrain/palm/small_fg'},
-	12: {'style': 'palm_fg', 'type': 'object', 'menu_type': 'palm fg', 'menu_surf': 'graphics/menu/large_fg.png', 'preview': 'graphics/preview/large_fg.png', 'graphics': 'graphics/terrain/palm/large_fg'},
-	13: {'style': 'palm_fg', 'type': 'object', 'menu_type': 'palm fg', 'menu_surf': 'graphics/menu/left_fg.png',  'preview': 'graphics/preview/left_fg.png',  'graphics': 'graphics/terrain/palm/left_fg'},
-	14: {'style': 'palm_fg', 'type': 'object', 'menu_type': 'palm fg', 'menu_surf': 'graphics/menu/right_fg.png', 'preview': 'graphics/preview/right_fg.png', 'graphics': 'graphics/terrain/palm/right_fg'},
+	11: {'style': 'qcomp_fg', 'type': 'object', 'menu_type': 'qcomp fg', 'menu_surf': 'graphics/menu/small_fg.png', 'preview': 'graphics/preview/small_fg.png', 'graphics': 'graphics/terrain/qcomp/small_fg'},
+	12: {'style': 'qcomp_fg', 'type': 'object', 'menu_type': 'qcomp fg', 'menu_surf': 'graphics/menu/large_fg.png', 'preview': 'graphics/preview/large_fg.png', 'graphics': 'graphics/terrain/qcomp/large_fg'},
+	13: {'style': 'qcomp_fg', 'type': 'object', 'menu_type': 'qcomp fg', 'menu_surf': 'graphics/menu/left_fg.png',  'preview': 'graphics/preview/left_fg.png',  'graphics': 'graphics/terrain/qcomp/left_fg'},
+	14: {'style': 'qcomp_fg', 'type': 'object', 'menu_type': 'qcomp fg', 'menu_surf': 'graphics/menu/right_fg.png', 'preview': 'graphics/preview/right_fg.png', 'graphics': 'graphics/terrain/qcomp/right_fg'},
 
-	15: {'style': 'palm_bg', 'type': 'object', 'menu_type': 'palm bg', 'menu_surf': 'graphics/menu/small_bg.png', 'preview': 'graphics/preview/small_bg.png', 'graphics': 'graphics/terrain/palm/small_bg'},
-	16: {'style': 'palm_bg', 'type': 'object', 'menu_type': 'palm bg', 'menu_surf': 'graphics/menu/large_bg.png', 'preview': 'graphics/preview/large_bg.png', 'graphics': 'graphics/terrain/palm/large_bg'},
-	17: {'style': 'palm_bg', 'type': 'object', 'menu_type': 'palm bg', 'menu_surf': 'graphics/menu/left_bg.png',  'preview': 'graphics/preview/left_bg.png',  'graphics': 'graphics/terrain/palm/left_bg'},
-	18: {'style': 'palm_bg', 'type': 'object', 'menu_type': 'palm bg', 'menu_surf': 'graphics/menu/right_bg.png', 'preview': 'graphics/preview/right_bg.png', 'graphics': 'graphics/terrain/palm/right_bg'},
+	15: {'style': 'qcomp_bg', 'type': 'object', 'menu_type': 'qcomp bg', 'menu_surf': 'graphics/menu/small_bg.png', 'preview': 'graphics/preview/small_bg.png', 'graphics': 'graphics/terrain/qcomp/small_bg'},
+	16: {'style': 'qcomp_bg', 'type': 'object', 'menu_type': 'qcomp bg', 'menu_surf': 'graphics/menu/large_bg.png', 'preview': 'graphics/preview/large_bg.png', 'graphics': 'graphics/terrain/qcomp/large_bg'},
+	17: {'style': 'qcomp_bg', 'type': 'object', 'menu_type': 'qcomp bg', 'menu_surf': 'graphics/menu/left_bg.png',  'preview': 'graphics/preview/left_bg.png',  'graphics': 'graphics/terrain/qcomp/left_bg'},
+	18: {'style': 'qcomp_bg', 'type': 'object', 'menu_type': 'qcomp bg', 'menu_surf': 'graphics/menu/right_bg.png', 'preview': 'graphics/preview/right_bg.png', 'graphics': 'graphics/terrain/qcomp/right_bg'},
 }
 
 '''
@@ -76,6 +76,7 @@ SHIELD_BAR_COLOR = '#4b527e'
 QUANTUM_CIRCUIT_BG_COLOR = '#444654'
 QUANTUM_CIRCUIT_WIRE_COLOR = '#ffffff'
 QUANTUM_GATE_PHASE_COLOR = '#97ad40'
+DIALOG_TEXT_COLOR = '#000000'
 
 # player settings
 PLAYER_SPEED = 300
@@ -140,3 +141,38 @@ QUANTUM_CIRCUIT_MARKER_MOVE_LEFT = 1
 QUANTUM_CIRCUIT_MARKER_MOVE_RIGHT = 2
 QUANTUM_CIRCUIT_MARKER_MOVE_UP = 3
 QUANTUM_CIRCUIT_MARKER_MOVE_DOWN = 4
+
+## LEVEL DIALOGUES
+LEVEL_DIALOGUES = {
+    'level_0': [
+        "QuantaVania is an action-adventure 2D platformer game with the potential to evolve into an open-world sandbox game in which players can learn quantum computing from the ground up while playing, design their own game level and share it with others in the quantum community via our web platform, and mine qubits, quantum gates and power-ups. \nOur game will not only allow them to run the game on their local device but also on real quantum computers and simulators from various quantum computing providers like IBM Quantum, IONQ, Rigetti Computing, etc.",
+        
+        "We intend to teach the player quantum computing as they go through the levels. We'll expose them to qubits in the first level, and then they'll have to find the X-Gate hiding behind any box or monster. As the levels progresses, the player will discover new gates that he may use in the gun circuit. And, at the end of each level, we will introduce to the user each quantum algorithm, from basic to advanced, in the form of a game problem.",
+    ],
+    'level_1': [
+        "This is \nQuantaVania \n Level 2: Dialogue 1!",
+        "This is \nQuantaVania \n Level 2: Dialogue 2!",
+        "This is \nQuantaVania \n Level 2: Dialogue 3!",
+    ],
+    'level_2': [
+        "This is \nQuantaVania \n Level 3: Dialogue 1!",
+        "This is \nQuantaVania \n Level 3: Dialogue 2!",
+        "This is \nQuantaVania \n Level 3: Dialogue 3!",
+    ],
+    'level_3': [
+        "This is \nQuantaVania \n Level 4: Dialogue 1!",
+        "This is \nQuantaVania \n Level 4: Dialogue 2!",
+        "This is \nQuantaVania \n Level 4: Dialogue 3!",
+    ],
+    'level_4': [
+        "This is \nQuantaVania \n Level 5: Dialogue 1!",
+        "This is \nQuantaVania \n Level 5: Dialogue 2!",
+        "This is \nQuantaVania \n Level 5: Dialogue 3!",
+    ],
+}
+
+PARAMETER_RANGE = {
+    "pr1002.tsp": (4375,2187),
+    "pr2392.tsp": (1875,937),
+    "rat195.tsp": (100,15)
+}

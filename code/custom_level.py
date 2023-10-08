@@ -8,8 +8,9 @@ from qiskit import BasicAer, transpile
 
 from settings import *
 from support import *
-from sprites import Generic, CollidableBlock, Cloud, AnimatedSprite, ParticleEffect, Coin, Spikes, CrabMonster, Shell, Player
+from sprites import Generic, CollidableBlock, Cloud, AnimatedSprite, ParticleEffect, Coin, Spikes, CrabMonster, ShootMonster, Player
 from quantum_circuit import QuantumCircuitGrid
+from dialog_box import DialogBox
 
 class CustomLevel:
     def __init__(self, current_level, new_max_level, level_grid, switch, create_overworld, asset_dictionary, audio):
@@ -17,14 +18,32 @@ class CustomLevel:
         self.switch = switch
         self.level_grid = level_grid
 
+        ## Overworld
+        self.create_overworld = create_overworld
+        self.current_level = current_level
+        self.new_max_level = new_max_level
+
+        ## QuantumCircuitGrid
+        self.num_qubits = self.current_level + 1 if self.current_level < 3 else 3
+        if self.current_level == 0:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 1, 3)
+        elif self.current_level == 1:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 2, 4)
+        elif self.current_level == 2:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 3, 5)
+        else:
+            self.qc_grid = QuantumCircuitGrid((30, 30), 3, 6)
+
         ## Objects/Sprites: Player, Trees, Qubit Bullets
         self.all_sprites = CameraGroup()
         self.coin_sprites = pygame.sprite.Group()
         self.damage_sprites = pygame.sprite.Group() ## Sprites of Enemies which will cause damage to player
         self.destroyable_enemies_sprites = pygame.sprite.Group() ## Sprites of Enemies which will can be destroyed by player qubit bullet
         self.collision_sprites = pygame.sprite.Group()
-        self.shell_sprites = pygame.sprite.Group()
+        self.shoot_monster_sprites = pygame.sprite.Group()
         self.qubit_bullet_sprites = pygame.sprite.Group()
+        # self.explosion_sprites = pygame.sprite.Group()
+
         ## UI
         self.bg_lvl1 = loadImage("graphics/background/1.png")
         self.health_bar = loadImage("graphics/ui/health_bar.png").convert_alpha()
@@ -37,7 +56,13 @@ class CustomLevel:
         self.shield_bar_topleft = (1230 - self.bar_max_width, 69)
         self.bar_height = 4
 
-        self.build_level(level_grid, asset_dictionary, audio['jump'])
+        ## Dialog Box
+        self.dialog_box_active = False
+        self.level_dialogues = LEVEL_DIALOGUES[f'level_{self.current_level}']
+        self.dialog_box = DialogBox(800, 400, (250, 150), self.level_display_surface, self.level_dialogues, self.dialog_box_active)
+
+        ## Build Level
+        self.build_level(level_grid, self.num_qubits, asset_dictionary, audio['jump'])
 
         ## Level Limits
         self.level_limits = {
@@ -63,23 +88,10 @@ class CustomLevel:
         self.hit_sound = audio['hit']
         self.hit_sound.set_volume(0.3)
 
-        ## Overworld
-        self.create_overworld = create_overworld
-        self.current_level = current_level
-        self.new_max_level = new_max_level
-
-        ## QuantumCircuitGrid
-        if self.current_level == 0:
-            self.qc_grid = QuantumCircuitGrid((30, 30), 1, 3)
-        elif self.current_level == 1:
-            self.qc_grid = QuantumCircuitGrid((30, 30), 2, 4)
-        elif self.current_level == 2:
-            self.qc_grid = QuantumCircuitGrid((30, 30), 3, 5)
-        else:
-            self.qc_grid = QuantumCircuitGrid((30, 30), 3, 6)
 
     ### DRAW LEVEL
-    def build_level(self, level_grid, asset_dictionary, jump_sound):
+    def build_level(self, level_grid, num_qubits, asset_dictionary, jump_sound):
+        
         for layer_name, layer in level_grid.items():
             for pos, data in layer.items():
                 if layer_name == 'terrain':
@@ -112,52 +124,52 @@ class CustomLevel:
                     case 7: # Spikes
                         Spikes(asset_dictionary['spikes'], pos, [self.all_sprites, self.damage_sprites])
                     case 8: # CrabMonster
-                        CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.damage_sprites, self.destroyable_enemies_sprites], self.collision_sprites)
-                    case 9: # Shell pointing left
-                        Shell(
+                        CrabMonster(asset_dictionary['crab_monster'], pos, [self.all_sprites, self.destroyable_enemies_sprites], self.collision_sprites, self.all_sprites, self.num_qubits)
+                    case 9: # ShootMonster pointing left
+                        ShootMonster(
                             orientation = 'left', 
-                            assets = asset_dictionary['shell'], 
+                            assets = asset_dictionary['shoot_monster'], 
                             position = pos, 
-                            group = [self.all_sprites, self.collision_sprites, self.shell_sprites], 
-                            pearl_surface = asset_dictionary['pearl'],
-                            damage_sprites = self.damage_sprites
+                            group = [self.all_sprites, self.collision_sprites, self.shoot_monster_sprites], 
+                            damage_sprites = self.damage_sprites,
+                            num_qubits = num_qubits
                         )
-                    case 10: # Shell pointing right
-                        Shell(
+                    case 10: # ShootMonster pointing right
+                        ShootMonster(
                             orientation = 'right', 
-                            assets = asset_dictionary['shell'], 
+                            assets = asset_dictionary['shoot_monster'], 
                             position = pos, 
-                            group = [self.all_sprites, self.collision_sprites, self.shell_sprites], 
-                            pearl_surface = asset_dictionary['pearl'],
-                            damage_sprites = self.damage_sprites
+                            group = [self.all_sprites, self.collision_sprites, self.shoot_monster_sprites], 
+                            damage_sprites = self.damage_sprites,
+                            num_qubits = num_qubits
                         )
                     # (ii) They need to know where the player is
 
-                    ## Foreground Palm Trees
-                    case 11: # small palm fg
-                        AnimatedSprite(asset_dictionary['palms']['small_fg'], pos, self.all_sprites)
+                    ## Foreground QComp Trees
+                    case 11: # small qcomp fg
+                        AnimatedSprite(asset_dictionary['qcomps']['small_fg'], pos, self.all_sprites)
                         CollidableBlock(pos, (76, 50), [self.collision_sprites]) # Invisible because CollidableBlock is not added to to self.all_sprites and CollidableBlock iself do not have any draw method which can be called through self.collision_sprites
-                    case 12: # large palm fg
-                        AnimatedSprite(asset_dictionary['palms']['large_fg'], pos, self.all_sprites)
+                    case 12: # large qcomp fg
+                        AnimatedSprite(asset_dictionary['qcomps']['large_fg'], pos, self.all_sprites)
                         CollidableBlock(pos, (76, 50), [self.collision_sprites]) ## Hit & Trail Values
-                    case 13: # left palm fg
-                        AnimatedSprite(asset_dictionary['palms']['left_fg'], pos, self.all_sprites)
+                    case 13: # left qcomp fg
+                        AnimatedSprite(asset_dictionary['qcomps']['left_fg'], pos, self.all_sprites)
                         CollidableBlock(pos, (76, 50), [self.collision_sprites])
-                    case 14: # right palm fg
-                        AnimatedSprite(asset_dictionary['palms']['right_fg'], pos, self.all_sprites)
+                    case 14: # right qcomp fg
+                        AnimatedSprite(asset_dictionary['qcomps']['right_fg'], pos, self.all_sprites)
                         CollidableBlock(pos + vector(50, 0), (76, 50), [self.collision_sprites])
 
-                    ## Background Palm Trees
-                    case 15: # small palm bg
-                        AnimatedSprite(asset_dictionary['palms']['small_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
-                    case 16: # large palm bg
-                        AnimatedSprite(asset_dictionary['palms']['large_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
-                    case 17: # left palm bg
-                        AnimatedSprite(asset_dictionary['palms']['left_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
-                    case 18: # right palm bg
-                        AnimatedSprite(asset_dictionary['palms']['right_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
+                    ## Background QComp Trees
+                    case 15: # small qcomp bg
+                        AnimatedSprite(asset_dictionary['qcomps']['small_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
+                    case 16: # large qcomp bg
+                        AnimatedSprite(asset_dictionary['qcomps']['large_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
+                    case 17: # left qcomp bg
+                        AnimatedSprite(asset_dictionary['qcomps']['left_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
+                    case 18: # right qcomp bg
+                        AnimatedSprite(asset_dictionary['qcomps']['right_bg'], pos, self.all_sprites, LEVEL_LAYERS['bg'])
             
-        for sprite in self.shell_sprites:
+        for sprite in self.shoot_monster_sprites:
             sprite.player = self.player
 
     def create_cloud(self):
@@ -216,17 +228,56 @@ class CustomLevel:
                 # print('diamond')
 
     def get_damage(self):
-        collision_sprites = pygame.sprite.spritecollide(self.player, self.damage_sprites, False, pygame.sprite.collide_mask)
+        collision_sprites = pygame.sprite.spritecollide(self.player, self.damage_sprites, True, pygame.sprite.collide_mask)
         if collision_sprites:
             self.hit_sound.play()
             self.player.damage()
+        
+        collision_destroyable_sprites  = pygame.sprite.spritecollide(self.player, self.destroyable_enemies_sprites, False, pygame.sprite.collide_mask)
+        if collision_destroyable_sprites:
+            self.hit_sound.play()
+            for destroyable_enemy in collision_destroyable_sprites:
+                enemy_center = destroyable_enemy.rect.centery
+                enemy_top = destroyable_enemy.rect.top
+                player_bottom = self.player.rect.bottom
+                if enemy_top < player_bottom < enemy_center and self.player.direction[1] >= 0:
+                    self.player.direction[1] = -1
+
+                    dot_product_value = self.calculate_dot_product(self.player.quantum_state, destroyable_enemy.state, self.num_qubits)
+                    if dot_product_value == 0:
+                        if destroyable_enemy.health > 0:
+                            destroyable_enemy.health -= min(destroyable_enemy.health, 30)
+                    else:
+                        if destroyable_enemy.health < destroyable_enemy.max_health:
+                            destroyable_enemy.health += min(destroyable_enemy.max_health - destroyable_enemy.health, 10)
+
+                else:
+                    self.player.damage()
+
+
+    def calculate_dot_product(self, hero_state, enemy_state, num_qubits):
+        hero_state = bin(hero_state)[2:].zfill(num_qubits)
+        enemy_state = bin(enemy_state)[2:].zfill(num_qubits)
+
+        if len(hero_state) != len(enemy_state):
+            raise ValueError("Bit strings must have the same length for dot product calculation!")
+
+        dot_product = sum(int(bit1) * int(bit2) for bit1, bit2 in zip(hero_state, enemy_state))
+        return dot_product
 
     def destroy_enemy(self):
         for qubit_bullet in self.qubit_bullet_sprites:
             for destroyable_enemy in self.destroyable_enemies_sprites:
-                print(qubit_bullet, destroyable_enemy)
-                if qubit_bullet.rect.colliderect(destroyable_enemy.rect):
+                if qubit_bullet.rect.colliderect(destroyable_enemy.rect) and pygame.sprite.collide_mask(qubit_bullet, destroyable_enemy):
                     print("Collision!!")
+                    dot_product_value = self.calculate_dot_product(qubit_bullet.qubit_bullet_state, destroyable_enemy.state, self.num_qubits)
+                    if dot_product_value == 0:
+                        if destroyable_enemy.health > 0:
+                            destroyable_enemy.health -= min(destroyable_enemy.health, 30)
+                    else:
+                        if destroyable_enemy.health < destroyable_enemy.max_health:
+                            destroyable_enemy.health += min(destroyable_enemy.max_health - destroyable_enemy.health, 10)
+                    qubit_bullet.kill()
 
     def check_death(self):
         if self.player.position.y > WINDOW_HEIGHT or self.player.health_damage >= 100:
@@ -244,29 +295,39 @@ class CustomLevel:
                 pygame.quit()
                 sys.exit()
             
-            if event.type == pygame.KEYDOWN:
-                self.qc_grid.handle_input(event.key)
-
-
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.bg_music.stop()
                 # self.switch()
                 self.create_overworld(2, 3)
-
-            # Shoot Qubit Bullets
-            if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[2]):
-                quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
-                qubit_bullet_state = self.run_quantum_circuit(quantum_circuit)
-                num_qubits = self.current_level + 1 if self.current_level < 3 else 3
-                terrain_start = {
-                    'x': (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[0])[0],
-                    'y': (sorted(list(self.level_grid['terrain'].keys()), key = lambda pos: pos[0])[0])[1]
-                }
-                self.qubit_bullet_sprites.add(self.player.create_qubit_bullet(qubit_bullet_state, num_qubits))
-                self.player.qubit_bullets -= 1
             
             if event.type == self.cloud_timer:
                 self.create_cloud()
+
+            if not self.dialog_box_active:
+                # Player Movement
+                self.player.input()
+
+                # Quantum Grid Inputs
+                if event.type == pygame.KEYDOWN:
+                    self.qc_grid.handle_input(event.key)
+
+                # Shoot Qubit Bullets and set player quantum state
+                if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[2]):
+                    quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
+                    qubit_bullet_state = self.player.quantum_state = self.run_quantum_circuit(quantum_circuit)
+                    num_qubits = self.current_level + 1 if self.current_level < 3 else 3
+                    self.qubit_bullet_sprites.add(self.player.create_qubit_bullet(qubit_bullet_state, num_qubits))
+                    self.player.qubit_bullets -= 1
+
+                # Set Player Quantum State
+                if (event.type == pygame.MOUSEBUTTONDOWN and mouse_buttons()[0]):
+                    quantum_circuit = self.qc_grid.qc_grid_model.create_quantum_circuit()
+                    self.player.quantum_state = self.run_quantum_circuit(quantum_circuit)
+
+                # Exit Dialog Box
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    if self.dialog_box.is_active:
+                        self.dialog_box.next_message()
     
     def run_quantum_circuit(self, quantum_circuit):
         simulator = BasicAer.get_backend("statevector_simulator")
@@ -302,6 +363,8 @@ class CustomLevel:
         self.show_health(self.player.health_damage, self.player.max_health_damage)
         self.show_shield(self.player.shield_damage, self.player.max_shield_damage)
         self.show_coin(self.player.qubit_bullets)
+
+        # self.dialog_box.run()
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):

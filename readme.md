@@ -112,6 +112,10 @@ python main.py
    ```bash
    python main.py
    ```
+8. Additionally Run qubo_minigame.py to play the QUBO Challenge Level
+   ```bash
+   python qubo_minigame.py
+   ```
 <!-- ------------------------------------------------------------------------- -->
 <hr />
 
