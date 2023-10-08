@@ -1,3 +1,9 @@
 pygame==2.5.0
 qiskit-terra==0.25.0
 dwave.system==1.21.0
+pyqubo==1.4.0
+networkx==2.8.8
+dwave-neal==0.60
+dimod==0.12.8
+numpy==1.23.5
+matplotlib==3.7.1
