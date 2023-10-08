@@ -101,7 +101,7 @@ class MiniGame:
 
     def draw_bg(self):
         bg= pygame.image.load("graphics/ui/minigame bg.png").convert_alpha()
-        minigame_surface.blit(bg, (0,0))
+        self.minigame_surface.blit(bg, (0,0))
 
     def draw_text(self, energy_txt, pf_text, r_text):
         energy_surface = self.font.render(f"Energy: {energy_txt[1]}",False, STATS_TEXT_COLOR)
@@ -114,7 +114,7 @@ class MiniGame:
     def event_loop(self):
         for event in pygame.event.get():
             # Detect if user wants to quit the game
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT :
                 pygame.quit()
                 sys.exit()
 
@@ -134,7 +134,7 @@ class MiniGame:
             #self.create_mainmenu()
     def run(self):
         self.event_loop
-        self.draw_bg
+        self.draw_bg()
         self.draw_buttons(self.minigame_surface)
         self.input()
         self.draw_bars(self.minigame_surface)
