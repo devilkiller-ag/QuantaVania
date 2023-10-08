@@ -20,6 +20,7 @@ class Buttons:
         if self.rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 self.clicked = True
+                print("clicked")
                 action = True
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
@@ -51,9 +52,11 @@ class MiniGame:
         self.r_max = PARAMETER_RANGE[file_name][0]
         self.r_min = PARAMETER_RANGE[file_name][1]
         QuboInstance = SolveQubo(f"challenges/{file_name}")
-        self.pf_current = self.energy = QuboInstance.run(self.r_min)
+        self.pf_current = self.energy = QuboInstance.run(self.r_max)
         self.minigame_surface = surface
         self.font = pygame.font.Font("graphics/ui/ARCADEPI.TTF" , 20)
+        self.pf_bar = Bar(906,60,45,385,self.pf_min, self.pf_max)
+        self.r_bar = Bar(150,500,980,45,self.r_min,self.r_max)
         
     def draw_graphs(self, surface):
         graph1 = pygame.image.load("problem.png").convert_alpha()
@@ -62,10 +65,17 @@ class MiniGame:
             graph2 = pygame.image.load("solution.png").convert_alpha()
             graph2 = pygame.transform.scale(graph2,(350,400))
         except FileNotFoundError:
-            print("No Solution available")
-            
+            #print("No Solution available")
+            pass
+        try:
+            graph2 = pygame.transform.scale(graph2,(350,400))
+        except UnboundLocalError:
+            pass
         surface.blit(graph1, (80,60))
-        surface.blit(graph2,(485,60))
+        try:
+            surface.blit(graph2,(485,60))
+        except UnboundLocalError:
+            pass
 
     def draw_buttons(self,surface):
         increment = pygame.image.load("graphics/ui/increment.png")
@@ -85,9 +95,8 @@ class MiniGame:
         self.back_button.draw(surface)
 
     def draw_bars(self, surface):
-        self.pf_bar = Bar(906,60,45,385,self.pf_min, self.pf_max)
         self.pf_bar.draw(surface)
-        self.r_bar = Bar(150,550,1066,45,self.r_min,self.r_max)
+        
         self.r_bar.draw(surface)
 
     def draw_bg(self):
@@ -95,9 +104,9 @@ class MiniGame:
         minigame_surface.blit(bg, (0,0))
 
     def draw_text(self, energy_txt, pf_text, r_text):
-        energy_surface = self.font.render(str(energy_txt),False, DIALOG_TEXT_COLOR)
-        pf_surface = self.font.render(str(pf_text),False, DIALOG_TEXT_COLOR)
-        r_surface = self.font.render(str(r_text),False, DIALOG_TEXT_COLOR)
+        energy_surface = self.font.render(f"Energy: {energy_txt[1]}",False, STATS_TEXT_COLOR)
+        pf_surface = self.font.render(f"Pf: {pf_text}",False, STATS_TEXT_COLOR)
+        r_surface = self.font.render(f"R: {r_text}",False, STATS_TEXT_COLOR)
         self.minigame_surface.blit(energy_surface, (970,64))
         self.minigame_surface.blit(pf_surface, (970,114))
         self.minigame_surface.blit(r_surface, (970,164))
@@ -115,7 +124,7 @@ class MiniGame:
             self.r_bar.current += (self.r_max-self.r_min)/100
         if self.decrement_button.draw(self.minigame_surface):
             print("decrease") 
-            self.r_bar.current -= (self.r_max-self.r_min)/100
+            self.r_bar.current-= (self.r_max-self.r_min)/100
         if self.calculate_button.draw(self.minigame_surface):
             print("calculate")
             self.pf_bar.current, energy_txt = QuboInstance.run(self.r_bar.current)
@@ -135,7 +144,7 @@ class MiniGame:
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
-game_test = MiniGame(screen, "pr1002.tsp")
+game_test = MiniGame(screen, "rat195.tsp")
 running = True
 while running:
    
