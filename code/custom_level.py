@@ -11,6 +11,7 @@ from support import *
 from sprites import Generic, CollidableBlock, Cloud, AnimatedSprite, ParticleEffect, Coin, Spikes, CrabMonster, ShootMonster, Player
 from quantum_circuit import QuantumCircuitGrid
 from dialog_box import DialogBox
+from challenges.qubo_challenge.qubo_minigame import QUBOMiniGame
 
 class CustomLevel:
     def __init__(self, current_level, new_max_level, level_grid, switch, create_overworld, asset_dictionary, audio):
@@ -76,6 +77,9 @@ class CustomLevel:
         self.cloud_timer = pygame.USEREVENT + 2
         pygame.time.set_timer(self.cloud_timer, 2000)
         self.startup_clouds()
+
+        ## QUBO CHALLENGE
+        self.qubo_minigame = QUBOMiniGame(self.level_display_surface, "pr1002.tsp")
 
         ## Sounds
         self.bg_music = audio['music']
@@ -365,6 +369,7 @@ class CustomLevel:
         self.show_coin(self.player.qubit_bullets)
 
         # self.dialog_box.run()
+        self.qubo_minigame.run()
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self):

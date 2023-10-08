@@ -1,7 +1,7 @@
 import pygame,sys
 
 from settings import *
-from qubo_challenge import *
+from challenges.qubo_challenge.qubo_challenge import *
 
 class Buttons:
     def __init__(self, x, y, image, scale):
@@ -9,7 +9,7 @@ class Buttons:
         height = image.get_height()
         self.image = pygame.transform.scale(image,(int(width*scale), int(height*scale))).convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.toprect = (x,y)
+        self.rect.topleft = (x,y)
         self.clicked = False
 
     def draw(self,surface):
@@ -41,7 +41,7 @@ class Bar:
         pygame.draw.rect(surface, (0,255,0),(self.x,self.y,self.w,self.h*ratio))
 
 
-class MiniGame:
+class QUBOMiniGame:
     def __init__(self, surface, file_name):
         self.file_name= file_name
         self.pf_max = 1
@@ -61,11 +61,11 @@ class MiniGame:
         surface.blit(self.graph2,(485,60))
 
     def draw_buttons(self,surface):
-        increment = pygame.image.load("graphics/ui/increment.png")
-        decrement = pygame.image.load("graphics/ui/decrement.png")
-        calculate = pygame.image.load("graphics/ui/calculate.png")
-        calculate_qa = pygame.image.load("graphics/ui/Calculate(QA).png")
-        back = pygame.image.load("graphics/ui/back.png")
+        increment = pygame.image.load("graphics/ui/qubo/increment.png")
+        decrement = pygame.image.load("graphics/ui/qubo/decrement.png")
+        calculate = pygame.image.load("graphics/ui/qubo/calculate.png")
+        calculate_qa = pygame.image.load("graphics/ui/qubo/Calculate(QA).png")
+        back = pygame.image.load("graphics/ui/qubo/back.png")
         self.increment_button = Buttons(1141,500,increment,1)
         self.decrement_button = Buttons(75,500,decrement,1)
         self.calculate_button = Buttons(817,622,calculate,1)
@@ -117,8 +117,8 @@ class MiniGame:
     def run(self):
         self.event_loop
         self.draw_bg
-        self.draw_buttons()
+        self.draw_buttons(self.minigame_surface)
         self.input()
         self.draw_bars()
-        self.draw_graphs()
+        self.draw_graphs(self.minigame_surface)
         self.draw_text()
