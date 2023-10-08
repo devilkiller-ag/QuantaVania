@@ -37,6 +37,8 @@ But, determined to escape this perilous condition, you go into the neon dungeons
 - Every enemy has different states, configure the quantum circuit inside you (with the gates you collect) to match the enemy state and damage them.
 - As you move towards a higher level, you have to solve interesting challenges based on quantum computing principles and algorithms.
 
+Watch Gameplay on YouTube: https://youtu.be/hiG8MVEmIc8
+
 <!-- ------------------------------------------------------------------------- -->
 
 <h2>Controls</h2>
