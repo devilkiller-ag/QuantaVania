@@ -174,5 +174,5 @@ LEVEL_DIALOGUES = {
 PARAMETER_RANGE = {
     "pr1002.tsp": (4375,2187),
     "pr2392.tsp": (1875,937),
-    "rat195.tsp": (100,37)
+    "rat195.tsp": (100,15)
 }
