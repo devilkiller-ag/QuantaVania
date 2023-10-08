@@ -94,9 +94,9 @@ def plot_city(cities, sol=None):
     nx.draw_networkx(G, cities_dict)
     plt.axis("off")
     if sol:
-        plt.savefig("problem.png")
-    else:
         plt.savefig("solution.png")
+    else:
+        plt.savefig("problem.png")
 
 def dist(i, j, cities):
     pos_i = cities[i][1]
@@ -171,3 +171,7 @@ def solve_for_instances(nodes_matrix, relaxation_parameter, Token=None, token_gi
     E_std = math.sqrt((s/128))
     return best_sample, num_broken, P_f, E_avg, E_std, E_min, cities  #returns bestsample, relaxation parameter, Pf, min, mean and std of energies
 
+'''
+QuboInstance = SolveQubo(f"challenges/rat195.tsp")
+QuboInstance.run(PARAMETER_RANGE["rat195.tsp"][0])
+'''

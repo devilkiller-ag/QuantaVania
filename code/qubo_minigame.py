@@ -3,6 +3,7 @@ import pygame,sys
 from settings import *
 from support import import_images_from_folder
 from qubo_challenge import *
+pygame.init()
 
 class Buttons:
     def __init__(self, x, y, image, scale):
@@ -10,7 +11,7 @@ class Buttons:
         height = image.get_height()
         self.image = pygame.transform.scale(image,(int(width*scale), int(height*scale))).convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.toprect = (x,y)
+        self.rect.topleft = (x,y)
         self.clicked = False
 
     def draw(self,surface):
@@ -49,17 +50,22 @@ class MiniGame:
         self.pf_min = 0
         self.r_max = PARAMETER_RANGE[file_name][0]
         self.r_min = PARAMETER_RANGE[file_name][1]
-        QuboInstance = SolveQubo(file_name)
+        QuboInstance = SolveQubo(f"challenges/{file_name}")
+        self.pf_current = self.energy = QuboInstance.run(self.r_min)
         self.minigame_surface = surface
         self.font = pygame.font.Font("graphics/ui/ARCADEPI.TTF" , 20)
         
     def draw_graphs(self, surface):
         graph1 = pygame.image.load("problem.png").convert_alpha()
         graph1 = pygame.transform.scale(graph1,(350,400))
-        graph2 = pygame.image.load("solution.png").convert_alpha()
-        graph2 = pygame.transform.scale(graph2,(350,400))
-        surface.blit(self.graph1, (80,60))
-        surface.blit(self.graph2,(485,60))
+        try:
+            graph2 = pygame.image.load("solution.png").convert_alpha()
+            graph2 = pygame.transform.scale(graph2,(350,400))
+        except FileNotFoundError:
+            print("No Solution available")
+            
+        surface.blit(graph1, (80,60))
+        surface.blit(graph2,(485,60))
 
     def draw_buttons(self,surface):
         increment = pygame.image.load("graphics/ui/increment.png")
@@ -67,29 +73,31 @@ class MiniGame:
         calculate = pygame.image.load("graphics/ui/calculate.png")
         calculate_qa = pygame.image.load("graphics/ui/Calculate(QA).png")
         back = pygame.image.load("graphics/ui/back.png")
-        increment_button = Buttons(1141,500,increment,1)
-        decrement_button = Buttons(75,500,decrement,1)
-        calculate_button = Buttons(817,622,calculate,1)
-        calculate_button_qa = Buttons(400,622,calculate_qa,1)
-        back_button = Buttons(100,600,back,1)
-        increment_button.draw(surface)
-        decrement_button.draw(surface)
-        calculate_button.draw(surface)
-        calculate_button_qa.draw(surface)
-        back_button.draw(surface)
+        self.increment_button = Buttons(1141,500,increment,1)
+        self.decrement_button = Buttons(75,500,decrement,1)
+        self.calculate_button = Buttons(817,622,calculate,1)
+        self.calculate_button_qa = Buttons(400,622,calculate_qa,1)
+        self.back_button = Buttons(100,600,back,1)
+        self.increment_button.draw(surface)
+        self.decrement_button.draw(surface)
+        self.calculate_button.draw(surface)
+        self.calculate_button_qa.draw(surface)
+        self.back_button.draw(surface)
 
-    def draw_bars(self):
-        pf_bar = Bar(906,60,45,385,self.pf_min, self.pf_max)
-        r_bar = Bar(150,550,1066,45,r_min,r_max)
+    def draw_bars(self, surface):
+        self.pf_bar = Bar(906,60,45,385,self.pf_min, self.pf_max)
+        self.pf_bar.draw(surface)
+        self.r_bar = Bar(150,550,1066,45,self.r_min,self.r_max)
+        self.r_bar.draw(surface)
 
     def draw_bg(self):
         bg= pygame.image.load("graphics/ui/minigame bg.png").convert_alpha()
         minigame_surface.blit(bg, (0,0))
 
     def draw_text(self, energy_txt, pf_text, r_text):
-        energy_surface = pygame.font.render(f"Objective energy: {energy_txt}",False, DIALOG_TEXT_COLOR)
-        pf_surface = pygame.font.render(f"Probability of Feasibility: {pf_txt}",False, DIALOG_TEXT_COLOR)
-        r_surface = pygame.font.render(f"Relaxation Parameter : {r_txt}",False, DIALOG_TEXT_COLOR)
+        energy_surface = self.font.render(str(energy_txt),False, DIALOG_TEXT_COLOR)
+        pf_surface = self.font.render(str(pf_text),False, DIALOG_TEXT_COLOR)
+        r_surface = self.font.render(str(r_text),False, DIALOG_TEXT_COLOR)
         self.minigame_surface.blit(energy_surface, (970,64))
         self.minigame_surface.blit(pf_surface, (970,114))
         self.minigame_surface.blit(r_surface, (970,164))
@@ -102,27 +110,39 @@ class MiniGame:
                 sys.exit()
 
     def input(self):
-        if increment_button.draw(self.minigame_surface):
+        if self.increment_button.draw(self.minigame_surface):
             print("increase")
-            r_bar.current += (self.r_max-self.r_min)/100
-        if decrement_button.draw(self.minigame_surface):
+            self.r_bar.current += (self.r_max-self.r_min)/100
+        if self.decrement_button.draw(self.minigame_surface):
             print("decrease") 
-            r_bar.current -= (self.r_max-self.r_min)/100
-        if calculate_button.draw(self.minigame_surface):
+            self.r_bar.current -= (self.r_max-self.r_min)/100
+        if self.calculate_button.draw(self.minigame_surface):
             print("calculate")
-            pf_bar.current, energy_txt = QuboInstance.run()
-            self.draw_text(energy_txt,pf_bar.current, r_bar.current)
-        if back_button.draw(self.minigame_surface):
+            self.pf_bar.current, energy_txt = QuboInstance.run(self.r_bar.current)
+            self.draw_text(energy_txt,self.pf_bar.current, self.r_bar.current)
+        if self.back_button.draw(self.minigame_surface):
             print("go back to main menu")
             #self.create_mainmenu()
     def run(self):
         self.event_loop
         self.draw_bg
-        self.draw_buttons()
+        self.draw_buttons(self.minigame_surface)
         self.input()
-        self.draw_bars()
-        self.draw_graphs()
-        self.draw_text()
+        self.draw_bars(self.minigame_surface)
+        self.draw_graphs(self.minigame_surface)
+        self.draw_text(self.energy, self.pf_bar.current, self.r_bar.current)
         
 
-        
+clock = pygame.time.Clock()
+screen = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
+game_test = MiniGame(screen, "pr1002.tsp")
+running = True
+while running:
+   
+    clock.tick(30)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running= False
+    
+    game_test.run()
+    pygame.display.update()

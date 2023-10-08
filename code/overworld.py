@@ -3,6 +3,7 @@ import pygame, sys
 from settings import *
 from support import import_images_from_folder
 
+
 class Node(pygame.sprite.Sprite):
 	def __init__(self, position, status, icon_speed, path):
 		super().__init__()
