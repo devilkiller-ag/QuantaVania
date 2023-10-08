@@ -1,7 +1,6 @@
 import pygame,sys
 
 from settings import *
-from support import import_images_from_folder
 from qubo_challenge import *
 
 class Buttons:
@@ -49,7 +48,7 @@ class MiniGame:
         self.pf_min = 0
         self.r_max = PARAMETER_RANGE[file_name][0]
         self.r_min = PARAMETER_RANGE[file_name][1]
-        QuboInstance = SolveQubo(file_name)
+        self.QuboInstance = SolveQubo(file_name)
         self.minigame_surface = surface
         self.font = pygame.font.Font("graphics/ui/ARCADEPI.TTF" , 20)
         
@@ -67,24 +66,24 @@ class MiniGame:
         calculate = pygame.image.load("graphics/ui/calculate.png")
         calculate_qa = pygame.image.load("graphics/ui/Calculate(QA).png")
         back = pygame.image.load("graphics/ui/back.png")
-        increment_button = Buttons(1141,500,increment,1)
-        decrement_button = Buttons(75,500,decrement,1)
-        calculate_button = Buttons(817,622,calculate,1)
-        calculate_button_qa = Buttons(400,622,calculate_qa,1)
-        back_button = Buttons(100,600,back,1)
-        increment_button.draw(surface)
-        decrement_button.draw(surface)
-        calculate_button.draw(surface)
-        calculate_button_qa.draw(surface)
-        back_button.draw(surface)
+        self.increment_button = Buttons(1141,500,increment,1)
+        self.decrement_button = Buttons(75,500,decrement,1)
+        self.calculate_button = Buttons(817,622,calculate,1)
+        self.calculate_button_qa = Buttons(400,622,calculate_qa,1)
+        self.back_button = Buttons(100,600,back,1)
+        self.increment_button.draw(surface)
+        self.decrement_button.draw(surface)
+        self.calculate_button.draw(surface)
+        self.calculate_button_qa.draw(surface)
+        self.back_button.draw(surface)
 
     def draw_bars(self):
         pf_bar = Bar(906,60,45,385,self.pf_min, self.pf_max)
-        r_bar = Bar(150,550,1066,45,r_min,r_max)
+        r_bar = Bar(150,550,1066,45, self.r_min, self.r_max)
 
     def draw_bg(self):
         bg= pygame.image.load("graphics/ui/minigame bg.png").convert_alpha()
-        minigame_surface.blit(bg, (0,0))
+        self.minigame_surface.blit(bg, (0,0))
 
     def draw_text(self, energy_txt, pf_text, r_text):
         energy_surface = pygame.font.render(f"Objective energy: {energy_txt}",False, DIALOG_TEXT_COLOR)
@@ -102,17 +101,17 @@ class MiniGame:
                 sys.exit()
 
     def input(self):
-        if increment_button.draw(self.minigame_surface):
+        if self.increment_button.draw(self.minigame_surface):
             print("increase")
-            r_bar.current += (self.r_max-self.r_min)/100
-        if decrement_button.draw(self.minigame_surface):
+            self.r_bar.current += (self.r_max-self.r_min)/100
+        if self.decrement_button.draw(self.minigame_surface):
             print("decrease") 
-            r_bar.current -= (self.r_max-self.r_min)/100
-        if calculate_button.draw(self.minigame_surface):
+            self.r_bar.current -= (self.r_max-self.r_min)/100
+        if self.calculate_button.draw(self.minigame_surface):
             print("calculate")
-            pf_bar.current, energy_txt = QuboInstance.run()
-            self.draw_text(energy_txt,pf_bar.current, r_bar.current)
-        if back_button.draw(self.minigame_surface):
+            self.pf_bar.current, energy_txt = self.QuboInstance.run()
+            self.draw_text(energy_txt, self.pf_bar.current, self.r_bar.current)
+        if self.back_button.draw(self.minigame_surface):
             print("go back to main menu")
             #self.create_mainmenu()
     def run(self):
@@ -123,6 +122,3 @@ class MiniGame:
         self.draw_bars()
         self.draw_graphs()
         self.draw_text()
-        
-
-        

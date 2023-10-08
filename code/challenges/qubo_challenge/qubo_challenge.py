@@ -1,19 +1,13 @@
-import pygame,sys
-from pygame.image import load as loadImage
-
-from settings import *
-from support import *
 from dwave.system import DWaveCliqueSampler
-import dimod
-import pyqubo
-import numpy as np
 from pyqubo import Array, Placeholder, Constraint
-import matplotlib.pyplot as plt
 import networkx as nx
 import neal
-import csv
-import os
+import numpy as np
 import math
+import matplotlib.pyplot as plt
+
+from support import *
+from settings import *
 
 class SolveQubo:
     def __init__(self, file_name, token_given=False, Token = None):

@@ -1,3 +1,5 @@
 pygame==2.5.0
 qiskit-terra==0.25.0
 dwave.system==1.21.0
+dimod=0.12.12
+pyqubo=1.4.0
