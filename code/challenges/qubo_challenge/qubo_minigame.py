@@ -87,8 +87,8 @@ class MiniGame:
 
     def draw_text(self, energy_txt, pf_text, r_text):
         energy_surface = pygame.font.render(f"Objective energy: {energy_txt}",False, DIALOG_TEXT_COLOR)
-        pf_surface = pygame.font.render(f"Probability of Feasibility: {pf_txt}",False, DIALOG_TEXT_COLOR)
-        r_surface = pygame.font.render(f"Relaxation Parameter : {r_txt}",False, DIALOG_TEXT_COLOR)
+        pf_surface = pygame.font.render(f"Probability of Feasibility: {self.pf_txt}",False, DIALOG_TEXT_COLOR)
+        r_surface = pygame.font.render(f"Relaxation Parameter : {self.r_txt}",False, DIALOG_TEXT_COLOR)
         self.minigame_surface.blit(energy_surface, (970,64))
         self.minigame_surface.blit(pf_surface, (970,114))
         self.minigame_surface.blit(r_surface, (970,164))
