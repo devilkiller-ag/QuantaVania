@@ -37,7 +37,7 @@ class Main:
 			'silver': self.silver,
 			'diamond': self.diamond,
 			'particles': self.particles,
-			'palms': self.palms,
+			'qcomps': self.qcomps,
 			'spikes': self.spikes,
 			'crab_monster': self.crab_monster,
 			'shoot_monster': self.shoot_monster,
@@ -90,8 +90,8 @@ class Main:
 		self.diamond = import_images_from_folder('graphics/items/diamond')
 		self.particles = import_images_from_folder('graphics/items/particle')
 
-		# palm trees
-		self.palms = {folder: import_images_from_folder(f'graphics/terrain/palm/{folder}') for folder in list(walk('graphics/terrain/palm'))[0][1]}
+		# qcomp trees
+		self.qcomps = {folder: import_images_from_folder(f'graphics/terrain/qcomp/{folder}') for folder in list(walk('graphics/terrain/qcomp'))[0][1]}
 
 		# enemies
 		self.spikes = loadImage('graphics/enemies/spikes/spikes.png').convert_alpha()
